@@ -1,5 +1,7 @@
 ## Bidirectional Deep Echo State Network
 
+This work is cloned from [FilippoMB](https://github.com/FilippoMB/Bidirectional-Deep-Echo-State-Network)!
+
 <img src="./imgs/BDESN.jpg" width="600" height="220">
 
 Implementation in Tensorflow of the Bidirectional Deep Echo State Network (BDESN), proposed in [ref to Arxiv coming soon](). 
