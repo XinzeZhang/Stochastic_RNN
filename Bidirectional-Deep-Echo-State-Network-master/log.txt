@@ -1,0 +1,25 @@
+Executing run  1  of  2 ...
+--- Training ESN ---
+	Tot training time: 0.014
+	Acc: 0.606, F1: 0.605
+--- Training RNN ---
+	Tot training time: 7.860
+	Acc: 0.683, F1: 0.682
+--- Training BDESN ---
+	Tot training time: 1.391
+	Acc: 0.733, F1: 0.736
+Executing run  2  of  2 ...
+--- Training ESN ---
+	Tot training time: 0.013
+	Acc: 0.611, F1: 0.610
+--- Training RNN ---
+	Tot training time: 8.030
+	Acc: 0.750, F1: 0.748
+--- Training BDESN ---
+	Tot training time: 1.395
+	Acc: 0.722, F1: 0.720
+       Accuracy [%]  Accuracy (std.)        F1  F1 (std.)  Tr. time [m]
+BDESN     72.777778         0.555556  0.727790   0.008077      1.393342
+GRU       71.666667         3.333333  0.714602   0.033076      7.944704
+ESN       60.833333         0.277778  0.607155   0.002516      0.013363
+
