@@ -184,7 +184,7 @@ if plot_on:
     
         # Evolution of the objective function
         fig=plt.clf()
-        fig=plt.figure(figsize=(5.5,3))
+        fig=plt.figure(figsize=(10,6))
         plt.xlabel('Iteration')
         plt.ylabel('Objective function')
         plt.yscale('log')
@@ -197,12 +197,13 @@ if plot_on:
                      ith_loss,
                      label='GRU',
                      color=colors[0],
-                     alpha=0.5)
+                     linestyle='dashed',
+                     alpha=1)
     
-            plt.plot(np.arange(loss_track.shape[1]),
-                     pd.DataFrame(ith_loss.reshape(-1)).ewm(span=15).mean(),
-                     color=colors[0],
-                     alpha=1.0)
+            # plt.plot(np.arange(loss_track.shape[1]),
+            #          pd.DataFrame(ith_loss.reshape(-1)).ewm(span=15).mean(),
+            #          color=colors[0],
+            #          alpha=1.0)
     
         if TRAIN_BDESN:
             ith_loss = loss_track[1, :] / n_runs
@@ -210,12 +211,12 @@ if plot_on:
                      ith_loss,
                      label='BDESN',
                      color=colors[2],
-                     alpha=0.5)
+                     alpha=1)
     
-            plt.plot(np.arange(loss_track.shape[1]),
-                     pd.DataFrame(ith_loss.reshape(-1)).ewm(span=15).mean(),
-                     color=colors[2],
-                     alpha=1.0)
+            # plt.plot(np.arange(loss_track.shape[1]),
+            #          pd.DataFrame(ith_loss.reshape(-1)).ewm(span=15).mean(),
+            #          color=colors[2],
+            #          alpha=1.0)
     
         
         plt.legend(loc='best', fontsize=10)
