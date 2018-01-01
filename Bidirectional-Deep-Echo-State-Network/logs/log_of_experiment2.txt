@@ -1,3 +1,5 @@
+epochs=5000
+
 Executing run  1  of  2 ...
 --- Training ESN ---
 	Tot training time: 0.018

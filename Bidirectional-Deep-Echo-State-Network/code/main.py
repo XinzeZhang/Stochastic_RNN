@@ -27,7 +27,7 @@ noise_level = 0.07  # noise in the reservoir state update
 
 # Parameters for GRU and BDESN
 batch_size = 25  # samples in the mini-batches in gradient descent training
-num_epochs = 5000  # number of epochs 
+num_epochs = 10000  # number of epochs 
 n_hidden_1 = 20  # size of 1st layer in MLP
 n_hidden_2 = 20  # size of 2nd layer in MLP
 n_hidden_3 = 10  # size of 3rd layer in MLP
@@ -198,6 +198,7 @@ if plot_on:
                      label='GRU',
                      color=colors[0],
                      linestyle='dashed',
+                     linewidth='0.5',
                      alpha=1)
     
             # plt.plot(np.arange(loss_track.shape[1]),
@@ -211,6 +212,7 @@ if plot_on:
                      ith_loss,
                      label='BDESN',
                      color=colors[2],
+                     linewidth='0.5',
                      alpha=1)
     
             # plt.plot(np.arange(loss_track.shape[1]),
