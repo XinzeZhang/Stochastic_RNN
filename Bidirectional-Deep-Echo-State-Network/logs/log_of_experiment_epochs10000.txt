@@ -1,0 +1,103 @@
+Executing run  1  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.013
+	Acc: 0.622, F1: 0.620
+--- Training RNN ---
+	Tot training time: 15.925
+	Acc: 0.700, F1: 0.699
+--- Training BDESN ---
+	Tot training time: 2.558
+	Acc: 0.739, F1: 0.739
+Executing run  2  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.011
+	Acc: 0.583, F1: 0.583
+--- Training RNN ---
+	Tot training time: 14.546
+	Acc: 0.772, F1: 0.773
+--- Training BDESN ---
+	Tot training time: 2.552
+	Acc: 0.711, F1: 0.711
+Executing run  3  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.012
+	Acc: 0.606, F1: 0.603
+--- Training RNN ---
+	Tot training time: 14.506
+	Acc: 0.767, F1: 0.767
+--- Training BDESN ---
+	Tot training time: 2.552
+	Acc: 0.750, F1: 0.748
+Executing run  4  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.011
+	Acc: 0.600, F1: 0.603
+--- Training RNN ---
+	Tot training time: 14.452
+	Acc: 0.761, F1: 0.752
+--- Training BDESN ---
+	Tot training time: 2.537
+	Acc: 0.700, F1: 0.697
+Executing run  5  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.013
+	Acc: 0.611, F1: 0.610
+--- Training RNN ---
+	Tot training time: 14.494
+	Acc: 0.811, F1: 0.809
+--- Training BDESN ---
+	Tot training time: 2.562
+	Acc: 0.711, F1: 0.708
+Executing run  6  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.014
+	Acc: 0.583, F1: 0.585
+--- Training RNN ---
+	Tot training time: 14.468
+	Acc: 0.761, F1: 0.760
+--- Training BDESN ---
+	Tot training time: 2.533
+	Acc: 0.667, F1: 0.664
+Executing run  7  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.011
+	Acc: 0.611, F1: 0.615
+--- Training RNN ---
+	Tot training time: 14.536
+	Acc: 0.711, F1: 0.701
+--- Training BDESN ---
+	Tot training time: 2.580
+	Acc: 0.744, F1: 0.750
+Executing run  8  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.012
+	Acc: 0.594, F1: 0.592
+--- Training RNN ---
+	Tot training time: 14.525
+	Acc: 0.761, F1: 0.756
+--- Training BDESN ---
+	Tot training time: 2.555
+	Acc: 0.689, F1: 0.685
+Executing run  9  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.012
+	Acc: 0.600, F1: 0.601
+--- Training RNN ---
+	Tot training time: 14.470
+	Acc: 0.828, F1: 0.827
+--- Training BDESN ---
+	Tot training time: 2.523
+	Acc: 0.694, F1: 0.689
+Executing run  10  of  10 ...
+--- Training ESN ---
+	Tot training time: 0.011
+	Acc: 0.600, F1: 0.605
+--- Training RNN ---
+	Tot training time: 14.538
+	Acc: 0.711, F1: 0.714
+--- Training BDESN ---
+	Tot training time: 2.560
+	Acc: 0.739, F1: 0.735
+ESN: acc=0.601+/-0.012, f1=0.602+/-0.011, time=0.012
+GRU: acc=0.758+/-0.040, f1=0.756+/-0.041, time=14.646
+BDESN: acc=0.714+/-0.026, f1=0.713+/-0.028, time=2.551

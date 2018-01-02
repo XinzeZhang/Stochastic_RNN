@@ -8,9 +8,9 @@ from modules import train_ESN, train_RNN, train_BDESN
 from reservoir import Reservoir
 
 dataset_name = 'LIB' # name of the dataset to process
-n_runs = 2  # number of different random initializations for each method
+n_runs = 10  # number of different random initializations for each method
 use_seed = False  # set to False to generate different random initializations at each execution
-plot_on = True  # set to false for textual output only
+plot_on = False  # set to false for textual output only
 
 # Set True to train a classifier based on a given network
 TRAIN_ESN = True
@@ -27,7 +27,7 @@ noise_level = 0.07  # noise in the reservoir state update
 
 # Parameters for GRU and BDESN
 batch_size = 25  # samples in the mini-batches in gradient descent training
-num_epochs = 10000  # number of epochs 
+num_epochs = 5000  # number of epochs 
 n_hidden_1 = 20  # size of 1st layer in MLP
 n_hidden_2 = 20  # size of 2nd layer in MLP
 n_hidden_3 = 10  # size of 3rd layer in MLP
@@ -198,8 +198,8 @@ if plot_on:
                      label='GRU',
                      color=colors[0],
                      linestyle='dashed',
-                     linewidth='0.5',
-                     alpha=1)
+                     linewidth='0.5'
+                    )
     
             # plt.plot(np.arange(loss_track.shape[1]),
             #          pd.DataFrame(ith_loss.reshape(-1)).ewm(span=15).mean(),
@@ -212,8 +212,8 @@ if plot_on:
                      ith_loss,
                      label='BDESN',
                      color=colors[2],
-                     linewidth='0.5',
-                     alpha=1)
+                     linewidth='0.5'
+                    )
     
             # plt.plot(np.arange(loss_track.shape[1]),
             #          pd.DataFrame(ith_loss.reshape(-1)).ewm(span=15).mean(),
