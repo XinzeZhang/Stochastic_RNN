@@ -7,7 +7,7 @@ from sklearn.decomposition import KernelPCA, PCA
 class Reservoir(object):
     '''
     This class contains methods to generate and retrieve states form a reservoir.
-    
+
     CONSTRUCTOR:
         generates a random reservoir parametrized by the following inputs
         - n_internal_units: number of processing units (neurons) in the reservoir
@@ -15,7 +15,7 @@ class Reservoir(object):
         - connectivity: number of nonzero connections in the reservoir
         - input_scaling: the constant value reservoir inputs are multiplied with
         - noise_level: deviation of the Gaussian noise 
-    
+
     GET_STATES:
         returns the last internal reservoir state generated after processing an input time series.
         - X: input time series
@@ -26,6 +26,7 @@ class Reservoir(object):
             and is concatenated to the original final state.
         - train: if True, the embedding method is fitted on the training data.
     '''
+
     def __init__(self, n_internal_units=100, spectral_radius=0.9,
                  connectivity=0.3, input_scaling=0.5, noise_level=0.01):
         # Initialize attributes
@@ -73,7 +74,7 @@ class Reservoir(object):
                 continue
 
         # Adjust the spectral radius.
-        internal_weights /= np.abs(w)/spectral_radius
+        internal_weights /= np.abs(w) / spectral_radius
 
         return internal_weights
 
@@ -82,7 +83,7 @@ class Reservoir(object):
         N, T, V = X.shape
         if self._input_weights is None:
             self._input_weights = \
-                2.0*np.random.rand(self._n_internal_units, V) - 1.0
+                2.0 * np.random.rand(self._n_internal_units, V) - 1.0
 
         # last reservoir state
         states = self._compute_state_matrix(X, n_drop)
@@ -126,7 +127,7 @@ class Reservoir(object):
                                 dtype=float)
 
         for t in range(T):
-            current_input = X[:, t, :]*self._input_scaling
+            current_input = X[:, t, :] * self._input_scaling
 
             # Calculate state. Add noise and apply nonlinearity.
             state_before_tanh = \
@@ -134,7 +135,7 @@ class Reservoir(object):
                 + self._input_weights.dot(current_input.T)
 
             state_before_tanh += \
-                np.random.rand(self._n_internal_units, N)*self._noise_level
+                np.random.rand(self._n_internal_units, N) * self._noise_level
 
             previous_state = np.tanh(state_before_tanh).T
 
@@ -143,4 +144,3 @@ class Reservoir(object):
                 state_matrix[:, t - n_drop, :] = previous_state
 
         return state_matrix
-

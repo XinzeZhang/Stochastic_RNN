@@ -29,7 +29,7 @@ class Model:
         self.model_list = []
 
 
-def adaboost_train(X, Y, Xte, Yte, iteration=10):
+def adaboost_train(X, Y, Xte, Yte, iteration=2):
     """
     :param: data_matrix: (N,T,V) np数组, 训练集, 样本按行排列
     :param: labels: (N,1) np数组 标注
@@ -40,7 +40,7 @@ def adaboost_train(X, Y, Xte, Yte, iteration=10):
     data_weights = np.ones((number, 1)) / number     # 初始化训练集权重为1/number
     # 初始化模型权重为0
     boosting_models = Model(iteration)
-    Yte = Yte.reshape((number, 1))
+    Yte = Yte.reshape((Yte.shape[0], 1))
 
     Y_class = onehot_encoder.fit_transform(Yte)
     num_classes = Y_class.shape[1]

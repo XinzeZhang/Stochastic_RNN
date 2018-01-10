@@ -29,7 +29,6 @@ def load_model():
     return model
 
 # 载入数据
-
 def load_matsets(dataset_name):
     # Load dataset
     data=sio.loadmat('./dataset/'+dataset_name+'.mat')
@@ -51,7 +50,7 @@ def load_matsets(dataset_name):
     # return num_classes, x, y, xte and yte
     return  X, Y, Xte, Yte
 
-X, Y, Xte, Yte=load_matsets('LIB')
+X, Y, Xte, Yte=load_matsets('PHAL')
 
 # # 预处理, 测试集/训练集分为8:2
 # train_matrix, cv_matrix, test_matrix = tt.split_data(data_matrix, (0.8, 0.0))
