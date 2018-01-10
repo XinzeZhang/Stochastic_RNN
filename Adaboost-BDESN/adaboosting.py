@@ -15,6 +15,9 @@ from tf_utils import train_tf_model
 from reservoir import Reservoir
 
 
+onehot_encoder = OneHotEncoder(sparse=False)
+
+
 class Model:
     """
     :return: model_weights: np数组,弱分类器权重
@@ -26,7 +29,7 @@ class Model:
         self.model_list = []
 
 
-def adaboost_train(X, Y, Xte, Yte, iteration=4):
+def adaboost_train(X, Y, Xte, Yte, iteration=10):
     """
     :param: data_matrix: (N,T,V) np数组, 训练集, 样本按行排列
     :param: labels: (N,1) np数组 标注
@@ -34,16 +37,27 @@ def adaboost_train(X, Y, Xte, Yte, iteration=4):
     输入训练集和弱分类器个数, 输出模型
     """
     number = X.shape[0]
-    data_weights = np.ones((number, 1)) / number        # 初始化训练集权重为1/number
+    data_weights = np.ones((number, 1)) / number     # 初始化训练集权重为1/number
     # 初始化模型权重为0
     boosting_models = Model(iteration)
     Yte = Yte.reshape((number, 1))
+
+    Y_class = onehot_encoder.fit_transform(Yte)
+    num_classes = Y_class.shape[1]
+
     for i in range(iteration):
+                
+        #  训练集X乘以对应的权重
+        X_weighted=X.copy()
+        # for r in range(number):
+        #     w_r=data_weights[r]
+        #     X_weighted[r]=X[r]*w_r
+
         i_esn, predictions, weighted_error = esn.boosting_train_ESN(
-            X, Y, Xte, Yte, data_weights, iteration)
+            X_weighted, Y, Xte, Yte, data_weights)
         boosting_models.model_list.append(i_esn)
-        boosting_models.model_weights[i] = 0.5 * \
-            math.log((1.0 - weighted_error) / max(weighted_error, 1e-16))
+        boosting_models.model_weights[i] = (math.log(
+            (1.0 - weighted_error) / weighted_error) + math.log(num_classes - 1))/num_classes
         data_weights = data_weights * \
             np.exp(-1.0 * boosting_models.model_weights[i] * Yte * predictions)
         data_weights /= np.sum(data_weights)
@@ -65,7 +79,7 @@ def adaboost_classify(input_matrix, m):
         #                                        m.model_list[i]['rule'])
         model_prediction = esn.boosting_classify_esn(
             input_matrix, m.model_list[i]['reservoir'], m.model_list[i]['readout'])
-        model_prediction=model_prediction.reshape((input_matrix.shape[0], 1))
+        model_prediction = model_prediction.reshape((input_matrix.shape[0], 1))
         models_output += m.model_weights[i] * model_prediction
     return np.around(models_output)
 
@@ -77,21 +91,24 @@ def adaboost_test(Xte, Yte, model):
     输入测试集和模型, 输出模型参数, 输出结果和正确率, 返回输出结果
     """
 
-
-    onehot_encoder = OneHotEncoder(sparse=False)
     Yte = onehot_encoder.fit_transform(Yte)
     num_classes = Yte.shape[1]
     
     models_output = adaboost_classify(Xte, model)
+    models_output=models_output.astype(int)
     true_class = np.argmax(Yte, axis=1)
+    true_class=true_class.reshape((true_class.shape[0],1))
 
     accuracy = accuracy_score(true_class, models_output)
 
-    if num_classes > 2:
-        f1 = f1_score(true_class, models_output, average='weighted')
-    else:
-        f1 = f1_score(true_class, models_output, average='binary')
+    print('\n')
+    print('Model Acc: %.3f' % accuracy)
 
-    print('\t Model Acc: %.3f, Model F1: %.3f' % (accuracy, f1))
+    # if num_classes > 2:
+    #     f1 = f1_score(true_class, models_output, average='weighted')
+    # else:
+    #     f1 = f1_score(true_class, models_output, average='binary')
+
+    # print('\t Model Acc: %.3f, Model F1: %.3f' % (accuracy, f1))
 
     return models_output

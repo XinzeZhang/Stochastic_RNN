@@ -57,12 +57,12 @@ def boosting_classify_esn(data_matrix, reservoir, readout):
     return pred_class
 
 
-def boosting_train_ESN(X, Y, Xte, Yte, data_weights, step_number=10):
+def boosting_train_ESN(X, Y, Xte, Yte, data_weights):
     """
     :param: data_matrix: 测试集, 样本按行排列
     :param: labels: 标注
     :param: data_weights: 训练集样本权重
-    :param: step_number: 迭代次数, 亦即设置阈值每一步的步长
+    # :param: step_number: 迭代次数, 亦即设置阈值每一步的步长
 
     :return: esn: ESN, 用dict实现
     :return: return_prediction: 预测的标注值
