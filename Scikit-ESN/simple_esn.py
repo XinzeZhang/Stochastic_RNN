@@ -104,6 +104,7 @@ class SimpleESN(BaseEstimator, TransformerMixin):
         self.weights_ = self.random_state.rand(self.n_components, self.n_components)-0.5
         spectral_radius = np.max(np.abs(la.eig(self.weights_)[0]))
         self.weights_ *=  self.weight_scaling / spectral_radius
+        print(self.weights_.shape)
         self.input_weights_ = self.random_state.rand(self.n_components,
                                                          1+n_features)-0.5
         self.readout_idx_ = self.random_state.permutation(arange(1+n_features,

@@ -51,6 +51,8 @@ def boosting_classify_esn(data_matrix, reservoir, readout):
     res_states = res.get_states(data_matrix, embedding=embedding_method,
                                       n_dim=None, train=True, bidir=False)
 
+    print(res_states.shape)
+
     logits = rout.predict(res_states)
     pred_class = np.argmax(logits, axis=1)
 
