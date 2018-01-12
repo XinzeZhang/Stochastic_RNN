@@ -30,7 +30,7 @@ def load_matsets(dataset_name):
     return X, Y, Xte, Yte
 
 
-X, Y, Xte, Yte = load_matsets('PHAL')
+X, Y, Xte, Yte = load_matsets('LIB')
 
 # Simple training
 # ------ Hyperparameters ------
@@ -48,25 +48,23 @@ my_esn = SimpleESN(n_components=hp_n_internal_units,
                    noise_level=hp_noise_level)
 
 # echo_train or echo_test 即 BDESN-ESN中reservoir.get_states的返回值
-echo_train = my_esn.fit_transform(X)
-regr = Ridge(alpha=2.12)
+my_esn.fit(X,Y)
 
-onehot_encoder = OneHotEncoder(sparse=False)
-Y = onehot_encoder.fit_transform(Y)
-Yte = onehot_encoder.transform(Yte)
+# y_pred=my_esn.predict(Xte)
 
-regr.fit(echo_train, Y)
+# onehot_encoder = OneHotEncoder(sparse=False)
+# onehot_encoder.fit_transform(Yte)
+# y_true_encoded = onehot_encoder.transform(Yte)
+# y_true = np.argmax(y_true_encoded, axis=1)
 
-echo_test = my_esn.transform(Xte)
-print(echo_test.shape)
+# # y_true=Yte
+# accuracy = accuracy_score(y_true, y_pred)
+# print('Acc: %.3f' % accuracy)
+# # f1 = f1_score(y_true, y_pred, average='weighted')
 
-y_true = np.argmax(Yte, axis=1)
 
-logits = regr.predict(echo_test)
-
-y_pred = np.argmax(logits, axis=1)
-
-accuracy = accuracy_score(y_true, y_pred)
-# f1 = f1_score(y_true, y_pred, average='weighted')
-
+# Yte=Yte.reshape((Yte.shape[0],))
+# # Yte=Yte.astpye(y_pred.dtype)
+# Yte=Yte.astype(y_pred.dtype)
+accuracy = my_esn.accuracy(Xte, Yte)
 print('Acc: %.3f' % accuracy)

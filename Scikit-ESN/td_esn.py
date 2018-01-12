@@ -25,6 +25,9 @@ import numpy as np
 import scipy.linalg as la
 from scipy import sparse
 from scipy.sparse import linalg as slinalg
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.linear_model import Ridge
+from sklearn.metrics import accuracy_score
 
 
 class SimpleESN(BaseEstimator, TransformerMixin):
@@ -108,10 +111,12 @@ class SimpleESN(BaseEstimator, TransformerMixin):
         self.connectivity = connectivity
         self.noise_level=noise_level
         self.input_weights_ = None
+        self.ridge_alpha=2.12
         # self.weights_ = None
         self.weights_=self._initialize_internal_weights(self.n_components,self.connectivity,self.weight_scaling)
         self.state_matrix=None
         self.last_state=None
+        self.ridge_regression=None
 
     def _initialize_internal_weights(self,n_components,
                                         connectivity, weight_scaling):
@@ -174,7 +179,7 @@ class SimpleESN(BaseEstimator, TransformerMixin):
 
         return self
 
-    def fit(self, X, y=None):
+    def fit(self, X, Y):
         """Initialize the network
 
         This is more compatibility step, as no learning takes place in the
@@ -182,14 +187,22 @@ class SimpleESN(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : array-like shape, (n_samples, n_features)
+        X : array-like shape, (n_samples, n_features) or (n_samples, n_timeseries, n_features)
             The data to be transformed.
+
+        Y : array-like shape, (n_samples,)
 
         Returns
         -------
         self : returns an instance of self.
         """
         self = self._fit_transform(X)
+        # 使用 onehot_encoder对多类别进行编码
+        onehot_encoder = OneHotEncoder(sparse=False)
+        Y_encoded = onehot_encoder.fit_transform(Y)
+        self.ridge_regression=Ridge(alpha=self.ridge_alpha)
+        self.ridge_regression=self.ridge_regression.fit(self.last_state,Y_encoded)
+        
         return self
 
     def fit_transform(self, X, y=None):
@@ -197,7 +210,7 @@ class SimpleESN(BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : array-like of shape [n_samples, n_features]
+        X : array-like of shape [n_samples, n_features] or (n_samples, n_timeseries, n_features)
             training set.
 
         Returns
@@ -209,7 +222,10 @@ class SimpleESN(BaseEstimator, TransformerMixin):
         return self.last_state
 
     def transform(self, X):
-       # n_samples, n_features = X.shape
+        '''
+        待填
+        '''
+        # n_samples, n_features = X.shape
         # X = check_array(X, ensure_2d=True)
         
         # span to 3-dim
@@ -220,7 +236,7 @@ class SimpleESN(BaseEstimator, TransformerMixin):
         if self.input_weights_ is None:
             self.input_weights_ = 2 * self.random_state.rand(self.n_components, n_features) - 1.0
 
-        self.state_matrix=np.empty((n_samples, n_timeseries - self.discard_steps, self.n_components),dtype=float)
+        test_state_matrix=np.empty((n_samples, n_timeseries - self.discard_steps, self.n_components),dtype=float)
 
         previous_state = np.zeros((n_samples, self.n_components), dtype=float)
 
@@ -236,7 +252,33 @@ class SimpleESN(BaseEstimator, TransformerMixin):
 
             # Store everything after the dropout period
             if (t > self.discard_steps - 1):
-                self.state_matrix[:, t - self.discard_steps , :] = previous_state
+                test_state_matrix[:, t - self.discard_steps , :] = previous_state
 
-        self.last_state=self.state_matrix[:,-1,:]
-        return self.last_state
+        test_last_state=test_state_matrix[:,-1,:]
+        return test_last_state
+
+    def _predict(self,X):
+
+        logits=self.ridge_regression.predict(self.transform(X))
+        y_pred = np.argmax(logits, axis=1)
+
+        return y_pred   
+
+    def predict(self,X):
+        
+        y_pred = self._predict(X)
+
+        return y_pred
+
+    def accuracy(self,Xte,Yte):
+
+        onehot_encoder = OneHotEncoder(sparse=False)
+        onehot_encoder.fit_transform(Yte)
+        Yte_encoded = onehot_encoder.transform(Yte)
+        y_true = np.argmax(Yte_encoded, axis=1)
+
+        # y_true=Yte
+        y_pred=self.predict(Xte)
+        acc = accuracy_score(y_true, y_pred)
+
+        return acc
