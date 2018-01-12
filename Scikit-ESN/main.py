@@ -2,10 +2,7 @@
 
 import scipy.io as sio
 from td_esn import SimpleESN
-from sklearn.linear_model import Ridge
-import numpy as np
-from sklearn.metrics import accuracy_score
-from sklearn.preprocessing import OneHotEncoder
+
 
 # 载入数据
 

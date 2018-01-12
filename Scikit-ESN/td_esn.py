@@ -17,12 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
-import sys
 from sklearn.base import TransformerMixin, BaseEstimator
-from sklearn.utils import check_random_state, check_array
-from numpy import zeros, ones, concatenate, array, tanh, vstack, arange
+from sklearn.utils import check_random_state
+from numpy import tanh
 import numpy as np
-import scipy.linalg as la
 from scipy import sparse
 from scipy.sparse import linalg as slinalg
 from sklearn.preprocessing import OneHotEncoder
@@ -62,7 +60,7 @@ class SimpleESN(BaseEstimator, TransformerMixin):
 
     random_state : integer or numpy.RandomState, optional 即设定种子，如果为空，则随机生成一个种子。
         Random number generator instance. If integer, fixes the seed.
-    
+
     connectivity : number of nonzero connections in the reservoir
 
     noise_level  : deviation of the Gaussian noise 
@@ -102,62 +100,66 @@ class SimpleESN(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, n_components=100, input_scaling=0.5,
-                 weight_scaling=0.9,connectivity=0.3,noise_level=0.01,discard_steps=0,random_state=None):
+                 weight_scaling=0.9, connectivity=0.3, noise_level=0.01, discard_steps=0, random_state=None):
         self.n_components = n_components
         self.input_scaling = input_scaling
         self.weight_scaling = weight_scaling
         self.discard_steps = discard_steps
         self.random_state = check_random_state(random_state)
         self.connectivity = connectivity
-        self.noise_level=noise_level
+        self.noise_level = noise_level
         self.input_weights_ = None
-        self.ridge_alpha=2.12
+        self.ridge_alpha = 2.12
         # self.weights_ = None
-        self.weights_=self._initialize_internal_weights(self.n_components,self.connectivity,self.weight_scaling)
-        self.state_matrix=None
-        self.last_state=None
-        self.ridge_regression=None
+        self.weights_ = self._initialize_internal_weights(
+            self.n_components, self.connectivity, self.weight_scaling)
+        self.state_matrix = None
+        self.last_state = None
+        self.ridge_regression = None
 
-    def _initialize_internal_weights(self,n_components,
-                                        connectivity, weight_scaling):
-            # The eigs function might not converge. Attempt until it does.
-            convergence = False
-            while (not convergence):
-                # Generate sparse, uniformly distributed weights.
-                internal_weights = sparse.rand(n_components,
-                                            n_components,
-                                            density=connectivity).todense()
+    def _initialize_internal_weights(self, n_components,
+                                     connectivity, weight_scaling):
+        # The eigs function might not converge. Attempt until it does.
+        convergence = False
+        while (not convergence):
+            # Generate sparse, uniformly distributed weights.
+            internal_weights = sparse.rand(n_components,
+                                           n_components,
+                                           density=connectivity).todense()
 
-                # Ensure that the nonzero values are
-                # uniformly distributed in [-0.5, 0.5]
-                internal_weights[np.where(internal_weights > 0)] -= 0.5
+            # Ensure that the nonzero values are
+            # uniformly distributed in [-0.5, 0.5]
+            internal_weights[np.where(internal_weights > 0)] -= 0.5
 
-                try:
-                    # Get the largest eigenvalue which means spectral_radius
-                    spectral_radius, _ = slinalg.eigs(internal_weights, k=1, which='LM')
+            try:
+                # Get the largest eigenvalue which means spectral_radius
+                spectral_radius, _ = slinalg.eigs(
+                    internal_weights, k=1, which='LM')
 
-                    convergence = True
+                convergence = True
 
-                except:
-                    continue
+            except:
+                continue
 
-            # Adjust the weight_scaling
-            internal_weights /= np.abs(spectral_radius) / weight_scaling
-            return internal_weights
+        # Adjust the weight_scaling
+        internal_weights /= np.abs(spectral_radius) / weight_scaling
+        return internal_weights
 
     def _fit_transform(self, X):
         # n_samples, n_features = X.shape
         # X = check_array(X, ensure_2d=True)
-        
+
         # span to 3-dim
         if len(X.shape) < 3:
             X = np.atleast_3d(X)
         n_samples, n_timeseries, n_features = X.shape
 
         if self.input_weights_ is None:
-            self.input_weights_ = 2 * self.random_state.rand(self.n_components, n_features) - 1.0
+            self.input_weights_ = 2 * \
+                self.random_state.rand(self.n_components, n_features) - 1.0
 
-        self.state_matrix=np.empty((n_samples, n_timeseries - self.discard_steps, self.n_components),dtype=float)
+        self.state_matrix = np.empty(
+            (n_samples, n_timeseries - self.discard_steps, self.n_components), dtype=float)
 
         previous_state = np.zeros((n_samples, self.n_components), dtype=float)
 
@@ -165,17 +167,20 @@ class SimpleESN(BaseEstimator, TransformerMixin):
             current_input = X[:, t, :] * self.input_scaling
 
             # Calculate state. Add noise and apply nonlinearity.
-            state_before_tanh = self.weights_.dot(previous_state.T) + self.input_weights_.dot(current_input.T)
+            state_before_tanh = self.weights_.dot(
+                previous_state.T) + self.input_weights_.dot(current_input.T)
 
-            state_before_tanh += np.random.rand(self.n_components, n_samples) * self.noise_level
+            state_before_tanh += np.random.rand(
+                self.n_components, n_samples) * self.noise_level
 
             previous_state = np.tanh(state_before_tanh).T
 
             # Store everything after the dropout period
             if (t > self.discard_steps - 1):
-                self.state_matrix[:, t - self.discard_steps , :] = previous_state
+                self.state_matrix[:, t -
+                                  self.discard_steps, :] = previous_state
 
-        self.last_state=self.state_matrix[:,-1,:]
+        self.last_state = self.state_matrix[:, -1, :]
 
         return self
 
@@ -200,22 +205,25 @@ class SimpleESN(BaseEstimator, TransformerMixin):
         # 使用 onehot_encoder对多类别进行编码
         onehot_encoder = OneHotEncoder(sparse=False)
         Y_encoded = onehot_encoder.fit_transform(Y)
-        self.ridge_regression=Ridge(alpha=self.ridge_alpha)
-        self.ridge_regression=self.ridge_regression.fit(self.last_state,Y_encoded)
-        
+        self.ridge_regression = Ridge(alpha=self.ridge_alpha)
+        self.ridge_regression = self.ridge_regression.fit(
+            self.last_state, Y_encoded)
+
         return self
 
-    def fit_transform(self, X, y=None):
-        """Generate echoes from the reservoir.
+    def fit_transform(self, X, Y=None):
+        """Generate echoes from the reservoir
 
         Parameters
         ----------
         X : array-like of shape [n_samples, n_features] or (n_samples, n_timeseries, n_features)
             training set.
 
+        Y : array-like shape, (n_samples,)
+
         Returns
         -------
-        readout : array, shape (n_samples, n_readout)
+        self.last_state : array, shape (n_samples, n_readout)
             Reservoir activation generated by the readout neurons
         """
         self = self._fit_transform(X)
@@ -227,16 +235,18 @@ class SimpleESN(BaseEstimator, TransformerMixin):
         '''
         # n_samples, n_features = X.shape
         # X = check_array(X, ensure_2d=True)
-        
+
         # span to 3-dim
         if len(X.shape) < 3:
             X = np.atleast_3d(X)
         n_samples, n_timeseries, n_features = X.shape
 
         if self.input_weights_ is None:
-            self.input_weights_ = 2 * self.random_state.rand(self.n_components, n_features) - 1.0
+            self.input_weights_ = 2 * \
+                self.random_state.rand(self.n_components, n_features) - 1.0
 
-        test_state_matrix=np.empty((n_samples, n_timeseries - self.discard_steps, self.n_components),dtype=float)
+        test_state_matrix = np.empty(
+            (n_samples, n_timeseries - self.discard_steps, self.n_components), dtype=float)
 
         previous_state = np.zeros((n_samples, self.n_components), dtype=float)
 
@@ -244,33 +254,36 @@ class SimpleESN(BaseEstimator, TransformerMixin):
             current_input = X[:, t, :] * self.input_scaling
 
             # Calculate state. Add noise and apply nonlinearity.
-            state_before_tanh = self.weights_.dot(previous_state.T) + self.input_weights_.dot(current_input.T)
+            state_before_tanh = self.weights_.dot(
+                previous_state.T) + self.input_weights_.dot(current_input.T)
 
-            state_before_tanh += np.random.rand(self.n_components, n_samples) * self.noise_level
+            state_before_tanh += np.random.rand(
+                self.n_components, n_samples) * self.noise_level
 
             previous_state = np.tanh(state_before_tanh).T
 
             # Store everything after the dropout period
             if (t > self.discard_steps - 1):
-                test_state_matrix[:, t - self.discard_steps , :] = previous_state
+                test_state_matrix[:, t -
+                                  self.discard_steps, :] = previous_state
 
-        test_last_state=test_state_matrix[:,-1,:]
+        test_last_state = test_state_matrix[:, -1, :]
         return test_last_state
 
-    def _predict(self,X):
+    def _predict(self, X):
 
-        logits=self.ridge_regression.predict(self.transform(X))
+        logits = self.ridge_regression.predict(self.transform(X))
         y_pred = np.argmax(logits, axis=1)
 
-        return y_pred   
+        return y_pred
 
-    def predict(self,X):
-        
+    def predict(self, X):
+
         y_pred = self._predict(X)
 
         return y_pred
 
-    def accuracy(self,Xte,Yte):
+    def accuracy(self, Xte, Yte):
 
         onehot_encoder = OneHotEncoder(sparse=False)
         onehot_encoder.fit_transform(Yte)
@@ -278,7 +291,7 @@ class SimpleESN(BaseEstimator, TransformerMixin):
         y_true = np.argmax(Yte_encoded, axis=1)
 
         # y_true=Yte
-        y_pred=self.predict(Xte)
+        y_pred = self.predict(Xte)
         acc = accuracy_score(y_true, y_pred)
 
         return acc
