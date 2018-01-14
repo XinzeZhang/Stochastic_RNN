@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import scipy.io as sio
-from td_esn import SimpleESN
+from scikit_esn import SimpleESN
 
 
 # 载入数据
