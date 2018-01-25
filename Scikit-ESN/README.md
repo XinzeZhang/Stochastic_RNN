@@ -31,10 +31,10 @@ No installation is required.
 
 ## Example
 
-Using the SimpleESN class is easy as:
+Using the SimpleESN class to classify is easy as:
 
 ```python
-from scikit_esn import SimpleESN
+from scikit_esn_classifier import SimpleESN
 import scipy.io as sio
 
 def load_matsets(dataset_name):
@@ -70,19 +70,4 @@ my_esn.fit(X,Y)
 accuracy = my_esn.accuracy(Xte, Yte)
 
 print('Acc: %.3f' % accuracy)
-```
-
-It could also be part of a Pipeline:
-
-```python
-from scikit_esn import SimpleESN
-# Pick your classifier
-pipeline = Pipeline([('esn', SimpleESN(n_readout=1000)),
-                     ('svr', svm.SVR())])
-parameters = {
-    'esn__weight_scaling': [0.5, 1.0],
-    'svr__C': [1, 10]
-}
-grid_search = GridSearchCV(pipeline, parameters)
-grid_search.fit(X_train, y_train)
 ```

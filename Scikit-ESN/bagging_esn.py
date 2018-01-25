@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import scipy.io as sio
-from scikit_esn import SimpleESN
+from scikit_esn_classifier import SimpleESN
 from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 # added for bagging
