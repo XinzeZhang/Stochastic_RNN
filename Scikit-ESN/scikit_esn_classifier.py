@@ -99,7 +99,7 @@ class SimpleESN(BaseEstimator, TransformerMixin):
     >>> echoes = esn.fit_transform(X)
     """
 
-    def __init__(self, n_components=100, input_scaling=0.5,
+    def __init__(self, n_components=1000, input_scaling=0.5,
                  weight_scaling=0.9, connectivity=0.3, noise_level=0.01, discard_steps=0, random_state=None):
         self.n_components = n_components
         self.input_scaling = input_scaling

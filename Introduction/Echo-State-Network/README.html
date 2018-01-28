@@ -5,7 +5,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.8.3/katex.min.css">
+      <link rel="stylesheet" href="file:////home/xinze/.vscode/extensions/shd101wyy.markdown-preview-enhanced-0.3.2/node_modules/@shd101wyy/mume/dependencies/katex/katex.min.css">
       
       
       
@@ -210,20 +210,121 @@ html body {
   text-align: justify;
   font-size: 12pt;
 }
+.markdown-preview.markdown-preview.phantomjs-pdf * {
+  color: #222222;
+  /* font-size: 13pt; */
+}
+.markdown-preview.markdown-preview.phantomjs-pdf p {
+  letter-spacing: 1pt !important;
+  line-height: 20pt !important;
+  min-height: 1em !important;
+  box-sizing: border-box !important;
+  word-wrap: break-word !important;
+  font-size: 13pt;
+  margin: 13pt 0pt !important;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf blockquote {
+  background-color: #efefef !important;
+  padding: 13pt 15pt !important;
+  margin: 0pt;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf blockquote p {
+  color: #595959;
+  margin: 0pt;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf strong {
+  font-weight: normal;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf body {
+  font-size: 15pt;
+  padding: 0 30pt;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf pre {
+  background-color: #f8f8f8;
+  border-radius: 3pt;
+  word-wrap: break-word;
+  padding: 12pt 13pt;
+  font-size: 13pt;
+  color: #444343;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf h1,
+.markdown-preview.markdown-preview.phantomjs-pdf h2,
+.markdown-preview.markdown-preview.phantomjs-pdf h3,
+.markdown-preview.markdown-preview.phantomjs-pdf h4,
+.markdown-preview.markdown-preview.phantomjs-pdf h5,
+.markdown-preview.markdown-preview.phantomjs-pdf h6 {
+  word-break: break-all !important;
+  margin: 20pt 0;
+  line-height: 1.2;
+  text-align: center;
+  font-weight: bold;
+  /* font-size: 20pt; */
+  display: block;
+  padding-bottom: 10pt;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf h1 {
+  /* font-size: 20pt; */
+  color: #0084a5 !important;
+  border-bottom: 2pt solid #0084a5 !important;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf h2,
+.markdown-preview.markdown-preview.phantomjs-pdf h3,
+.markdown-preview.markdown-preview.phantomjs-pdf h4,
+.markdown-preview.markdown-preview.phantomjs-pdf h5,
+.markdown-preview.markdown-preview.phantomjs-pdf h6 {
+  font-size: 16pt !important;
+  color: #089cbb !important;
+  border-bottom: none !important;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf a {
+  font-size: 20pt;
+  color: #0084a5 !important;
+  text-decoration: none !important;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf ul,
+.markdown-preview.markdown-preview.phantomjs-pdf ol {
+  padding-left: 30pt;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf li {
+  line-height: 16pt;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf hr {
+  height: 4pt;
+  padding: 0;
+  margin: 16pt 0;
+  background-color: #e7e7e7;
+  border: 0 none;
+  overflow: hidden;
+  box-sizing: content-box;
+  border-bottom: 1pt solid #ddd;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf pre {
+  background: #f2f2f2 !important;
+  padding: 12pt 13pt;
+  overflow: auto;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf code {
+  color: #a71d5d;
+  overflow: auto;
+}
+.markdown-preview.markdown-preview.phantomjs-pdf img {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
  
       </style>
     </head>
     <body for="html-export">
       <div class="mume markdown-preview   ">
-      <h1 class="mume-header" id="echo-state-networkhttpwwwscholarpediaorgarticleecho_state_network"><a href="http://www.scholarpedia.org/article/Echo_state_network">Echo state network</a></h1>
+      <link rel="stylesheet" href="themes/infoq.css">
+<h1 class="mume-header" id="echo-state-networkhttpwwwscholarpediaorgarticleecho_state_network"><a href="http://www.scholarpedia.org/article/Echo_state_network">Echo state network</a></h1>
 
 <p><em>Author: Herbert Jaeger, Jacobs University Bremen, Bremen, Germany</em></p>
 <p>对于前馈神经网络，一种便捷的训练方式是将其input-&gt;hidden和hidden-&gt;hidden之间的连接权重随机且固定，然后仅训练最后一层，即仅训练hidden-&gt;output间的连接权重，而最后的hidden层与output层之间实际为线性模型。通过这种方式，我们得到了一个具有非线性能力同时训练又非常快速的随机前馈神经网络。</p>
-<p>在随机前馈神经网络的启发下，类似的思想可以应用在循环神经网络Recurrent Neural Network（RNN）上。相同的，我们将RNN中的input-&gt;hidden和hidden-&gt;hidden间连接权重随机固定，仅学习hidden-&gt;output间的连接权重。这种具有随机机制的RNN便是Jaeger（2001）所提出的Echo state network（ESN）。</p>
+<p>在随机前馈神经网络的启发下，类似的思想可以应用在Recurrent Neural Network （RNN）上。相同的，我们将RNN中的input-&gt;hidden和hidden-&gt;hidden间连接权重随机固定，仅学习hidden-&gt;output间的连接权重。这种具有随机机制的RNN便是Jaeger（2001）所提出的Echo state network（ESN）。</p>
 <p>更具体一点讲，ESN的主要思想是建立一个随机的、固定的、多循环神经元的循环神经网络来进行有监督的学习。在ESN的观点中，循环神经元的组合被视为循环池Reservoir，输入的信号在循环池中的各神经元处各得到一种非线性的前馈信号，然后将这些非线性的信号加以组合得到Reservoir的最后一层状态。此时，Reservoir与output之间的训练过程即为训练Reservoir中产生的前馈信号组去逼近目标信号的过程，即一种线性组合的训练过程。</p>
-<div style="text-align:center">
-<img src="./imgs/esn-example.png" height="300">
-</div>
+<p><img src="imgs/esn-example.png" alt="esn-example"></p>
 <p>例如，训练ESN去生成一个Sin函数。输入<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>u</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">u(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base"><span class="mord mathit">u</span><span class="mopen">(</span><span class="mord mathit">n</span><span class="mclose">)</span></span></span></span>是一组低频信号，目标<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>y</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">y(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.03588em;">y</span><span class="mopen">(</span><span class="mord mathit">n</span><span class="mclose">)</span></span></span></span>是一组对应当前输入的sin信号。假设训练集为<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi><mo>=</mo><mo>(</mo><mi>u</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo separator="true">,</mo><mi>y</mi><mo>(</mo><mn>1</mn><mo>)</mo><mo>)</mo><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mo>(</mo><mi>u</mi><mo>(</mo><msub><mi>n</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>)</mo><mo separator="true">,</mo><mi>y</mi><mo>(</mo><msub><mi>n</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">D = (u(1),y(1)),\ldots, (u(n_{max}),y(n_{max}))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base"><span class="mord mathit" style="margin-right:0.02778em;">D</span><span class="mrel">=</span><span class="mopen">(</span><span class="mord mathit">u</span><span class="mopen">(</span><span class="mord mathrm">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mord mathit" style="margin-right:0.03588em;">y</span><span class="mopen">(</span><span class="mord mathrm">1</span><span class="mclose">)</span><span class="mclose">)</span><span class="mpunct">,</span><span class="minner">…</span><span class="mpunct">,</span><span class="mopen">(</span><span class="mord mathit">u</span><span class="mopen">(</span><span class="mord"><span class="mord mathit">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathit mtight">m</span><span class="mord mathit mtight">a</span><span class="mord mathit mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mord mathit" style="margin-right:0.03588em;">y</span><span class="mopen">(</span><span class="mord"><span class="mord mathit">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathit mtight">m</span><span class="mord mathit mtight">a</span><span class="mord mathit mtight">x</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"></span></span></span></span></span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></p>
 
       </div>

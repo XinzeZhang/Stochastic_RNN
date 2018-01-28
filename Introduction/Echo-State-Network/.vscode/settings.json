@@ -1,7 +1,6 @@
 {
     "markdown-pdf.styles": [
-        ".vscode/export.css"
+        "themes/infoq.css"
     ],
     "markdown-preview-enhanced.imageFolderPath": "/imgs",
-    "markdown-pdf.highlightStyle": ".vscode/school-book.css",
 }

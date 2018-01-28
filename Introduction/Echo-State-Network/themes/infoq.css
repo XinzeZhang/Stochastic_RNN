@@ -1,28 +1,30 @@
 * {
-  color: #4a4a4a;
+  color: #222222;
+  /* font-size: 13pt; */
   // font-family: -apple-system-font, 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 
 }
   
 p{
-  letter-spacing: 1px !important;
-  line-height: 28px !important;
+  letter-spacing: 1pt !important;
+  line-height: 20pt !important;
   min-height: 1em !important;
   box-sizing: border-box !important;
   word-wrap: break-word !important;
-  text-align: left;
-  margin: 20px 0px !important;
+  /* text-align: left; */
+  font-size: 13pt;
+  margin: 13pt 0pt !important;
 }
 
 blockquote {
     background-color: #efefef !important;
-    padding: 13px 15px !important;
-    margin: 0px;
+    padding: 13pt 15pt !important;
+    margin: 0pt;
 }
 
 blockquote p {
   color: #595959;
-  margin: 0px;
+  margin: 0pt;
 }
 
 strong {
@@ -30,72 +32,80 @@ strong {
 }
 
 body {
-  font-size: 15px;
-  padding: 0 30px;
+  font-size: 15pt;
+  padding: 0 30pt;
 }
 
 pre {
   background-color: #f8f8f8;
-  border-radius: 3px;
+  border-radius: 3pt;
   word-wrap: break-word;
-  padding: 12px 13px;
-  font-size: 13px;
-  color: #898989;
+  padding: 12pt 13pt;
+  font-size: 13pt;
+  color: #444343;
 }
 
 h1,h2,h3,h4,h5,h6 {
     word-break: break-all !important;
-    margin: 20px 0;
+    margin: 20pt 0;
     line-height: 1.2;
     text-align: center;
     font-weight: bold;
-    font-size: 20px;
+    /* font-size: 20pt; */
     display: block;
-    padding-bottom: 10px;
+    padding-bottom: 10pt;
 }
 
 h1 {
-    color: #00b38a !important;
-    border-bottom: 2px solid #00b38b !important;
+    /* font-size: 20pt; */
+    color: #0084a5 !important;
+    border-bottom: 2pt solid #0084a5 !important;
 }
 
 h2,h3,h4,h5,h6 {
-    font-size: 16px !important;
+    font-size: 16pt !important;
     color: #089cbb !important;
     border-bottom: none !important;
 }
 
 a {
-  color: #00b38b !important;
+  font-size: 20pt;
+  color: #0084a5 !important;
   text-decoration: none !important;
 }
 
 ul, ol {
-  padding-left: 30px;
+  padding-left: 30pt;
 }
 
 li {
-  line-height: 24px;
+  line-height: 16pt;
 }
 
 hr {
-    height: 4px;
+    height: 4pt;
     padding: 0;
-    margin: 16px 0;
+    margin: 16pt 0;
     background-color: #e7e7e7;
     border: 0 none;
     overflow: hidden;
     box-sizing: content-box;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1pt solid #ddd;
 }
 
 pre {
  background: #f2f2f2 !important;
- padding: 12px 13px;
+ padding: 12pt 13pt;
  overflow: auto;
 }
 
 code {
   color: #a71d5d;
   overflow: auto;
+}
+
+img {
+  margin-left: auto; 
+  margin-right:auto; 
+  display:block;
 }
