@@ -14,7 +14,7 @@ _Author: Herbert Jaeger, Jacobs University Bremen, Bremen, Germany_
 ## 举例
 下面将举一个例子。如图所示，训练ESN去生成一个Sin函数。输入$u(n)$是一组低频信号，目标$y(n)$是一组对应当前输入的sin信号。假设训练集为$D = (u(1),y(1)),\ldots, (u(n_{max}),y(n_{max}))$，其中输入是频率从1/16到1/4Hz的频率信号，输出（目标）为一组由输入频率确定的sin信号。图中，实线表示随机且固定的连接，虚线表示可训练的连接。
 
-![esn-example](/imgs/esn-example.png)
+<img src="./imgs/esn-example.png" width="650">
 
 在实现ESN的逼近过程中，可大致分为以下三个阶段：
 1. **创建一个随机的ＲＮＮ**
@@ -28,7 +28,7 @@ _Author: Herbert Jaeger, Jacobs University Bremen, Bremen, Germany_
 
 训练结果如图所示:
 
-![esn-example](/imgs/esn-example-result.png)
+<img src="./imgs/esn-example-result.png" width="650">
 
 图中的阶跃函数表示的是input信号。黑色的sin函数表示的是目标即正确的输出。灰色的sin函数为ESN的output结果。其中output与teacher signal间的差异是不可避免的。
 
