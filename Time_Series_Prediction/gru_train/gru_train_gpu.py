@@ -91,5 +91,5 @@ if __name__ == '__main__':
         # draw(y[0], 'r')
         # draw(y[1], 'g')
         # draw(y[2], 'b')
-        # plt.savefig('./gru_train/predict%d.pdf'%i)
+        # plt.savefig('predict%d.pdf'%i)
         # plt.close()

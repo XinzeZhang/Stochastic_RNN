@@ -46,7 +46,8 @@ if __name__ == '__main__':
     torch.manual_seed(0)
     # load data and make training set
     data = torch.load('traindata.pt')
-    input = Variable(torch.from_numpy(data[3:, :-1]), requires_grad=False)
+    input=data[3:, :-1]
+    input = Variable(torch.from_numpy(input), requires_grad=False)
     target = Variable(torch.from_numpy(data[3:, 1:]), requires_grad=False)
     test_input = Variable(torch.from_numpy(data[:3, :-1]), requires_grad=False)
     test_target = Variable(torch.from_numpy(data[:3, 1:]), requires_grad=False)
@@ -91,5 +92,5 @@ if __name__ == '__main__':
         # draw(y[0], 'r')
         # draw(y[1], 'g')
         # draw(y[2], 'b')
-        # plt.savefig('./gru_train/predict%d.pdf'%i)
+        # plt.savefig('predict%d.pdf'%i)
         # plt.close()
