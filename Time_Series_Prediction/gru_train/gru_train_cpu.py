@@ -22,7 +22,7 @@ class Sequence(nn.Module):
         h_t = Variable(torch.zeros(input.size(0), 51).double(), requires_grad=False)
         h_t2 = Variable(torch.zeros(input.size(0), 51).double(), requires_grad=False)
 
-        for i, input_t in enumerate(input.chunk(input.size(1), dim=1)):
+        for i,input_t in enumerate(input.chunk(input.size(1), dim=1)):
             h_t= self.gru1(input_t, h_t)
             h_t2 = self.gru2(h_t, h_t2)
             output = self.linear(h_t2)
