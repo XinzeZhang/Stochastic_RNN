@@ -90,75 +90,60 @@ if __name__ == '__main__':
     train_scope=np.arange(train_size)
     # test_size = dataset.shape[0] - train_size
     test_scope= np.arange(train_size,set_length)
-    
+    #-------------------------------------------------------------------
     # divide the tf_values to train set and test set
     tf_train=tf_values_array[:train_size].copy()
     tf_expect=tf_values_array[train_size:].copy()
+    #--------------------------------------------------------------------
     #divide the tf_values_diff to train set and test set
     train, test = dataset[0:train_size], dataset[train_size:]
     tf_train_diff=train[:,:1]
     tf_test_diff=test[:,:1]
     tf_test_diff=np.insert(tf_test_diff,[-1],dataset[-1,-1])
+    #--------------------------------------------------------------------
+    # transform the scale of the data
+    scaler, train_scaled, test_scaled = scale(train, test)
+    # divided the train_set and test_set
+    tf_trian_scaled=train_scaled[:,:1]
+    tf_test_scaled=test_scaled[:,:1]
+    tf_test_scaled=np.insert(tf_test_scaled,[-1],test_scaled[-1,-1])
 
-    #prepare the data plot
-    def draw(scope,date, date_color,date_label):
-        plt.plot(scope, date,date_color,label=date_label,linewidth = 1.0)
-    # plt.figure(figsize=(90,10))
-    plt.figure(figsize=(50,60))    
+    #=====================================================================
+    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    plt.figure(figsize=(60,60))    
     # locate the sublabel
     # draw the train set and test set
     ax1=plt.subplot(311)
     ax1.set_xticks(np.arange(0,set_length,10))
-    plt.plot(train_scope, tf_train,'k',label='tf_train',linewidth = 1.0)
-    plt.plot(test_scope, tf_expect,'k:',label='tf_expect',linewidth = 1.0)
-    # plt.step(ax1.get_xticklabels(),fontsize=5)
-    # plt.minorticks_on()
-    plt.grid()
-    plt.legend(loc='upper right')
-    ax1.set_title('values for time sequences')
+    ax1.plot(train_scope, tf_train,'r',label='tf_train',linewidth = 1.0)
+    ax1.plot(test_scope, tf_expect,'r:',label='tf_expect',linewidth = 1.0)
+    ax1.minorticks_on()
+    ax1.grid(which='both')
+    ax1.legend(loc='upper right')
+    ax1.set_title('Values for Time Sequences')
     plt.xlabel('Time Sequence' )
     plt.ylabel('Value')
-    # plt.xticks(fontsize=20)
-    # plt.yticks(fontsize=20)
-    # plt.show()
-
+    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ax2=plt.subplot(312,sharex=ax1)
-    ax2.plot(train_scope, tf_train_diff,'r',label='tf_train_diff',linewidth = 1.0)
-    ax2.plot(test_scope, tf_test_diff,'r:',label='tf_expect_diff',linewidth = 1.0)
+    ax2.plot(train_scope, tf_train_diff,'g',label='tf_train_diff',linewidth = 1.0)
+    ax2.plot(test_scope, tf_test_diff,'g:',label='tf_expect_diff',linewidth = 1.0)
     ax2.minorticks_on()
-    # tick_spacing=ticker.MultipleLocator(base=5.0)
-    # ax.xaxis.set_major_locator=(tick_spacing)
     ax2.grid(which='both')
-    plt.legend(loc='upper right')
-    ax2.set_title('values_difference for time sequences')
+    ax2.legend(loc='upper right')
+    ax2.set_title('Values_difference for Time Sequences')
     plt.xlabel('Time Sequence')
     plt.ylabel('Difference')
-    # plt.xticks(fontsize=20)
-    # plt.yticks(fontsize=20)
+    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    ax3=plt.subplot(313,sharex=ax1)
+    ax3.plot(train_scope, tf_trian_scaled,'b',label='tf_train_diff_scaled',linewidth = 1.0)
+    ax3.plot(test_scope, tf_test_scaled,'b:',label='tf_expect_diff_scaled',linewidth = 1.0)
+    ax3.minorticks_on()
+    ax3.grid(which='both')
+    ax3.legend(loc='upper right')
+    ax3.set_title('Values_difference_scaled for Time Sequences')
+    plt.xlabel('Time Sequence')
+    plt.ylabel('Scaled Difference')
 
-    plt.subplots_adjust(hspace=0.5)
+    plt.subplots_adjust(hspace=0.75)
+    plt.savefig('data_visualization.png')
     plt.show()
-    #
-
-
-
-    # # transform the scale of the data
-    # scaler, train_scaled, test_scaled = scale(train, test)
-
-    # # divided the train_set and test_set
-    # train_input_scaled=train_scaled[:,:1]
-    # train_target_scaled=train_scaled[:,1:]
-    # test_input_scaled=test_scaled[:, :1]
-    # test_target_scaled=test_scaled[:, 1:]
-
-
-
-
-
-
-    # time_period=np.arange(len(y_pred))
-    # plt.plot(time_period,y_pred,color='blue',linestyle='--',label='Prediction')
-    # plt.plot(time_period,expected,color='green',linestyle='-',label='Original')
-
-    # plt.savefig('Prediction.png')
-    # plt.show()
