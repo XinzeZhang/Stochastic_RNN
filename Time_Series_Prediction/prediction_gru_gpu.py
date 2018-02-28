@@ -133,7 +133,10 @@ if __name__ == '__main__':
     series = read_csv('chinese_oil_production.csv', header=0,
                     parse_dates=[0], index_col=0, squeeze=True)
 
+    # transfer the dataset to array
     raw_values = series.values
+    ts_values_array=np.array(raw_values)
+    set_length=len(ts_values_array)
 
     # transform data to be stationary
     diff = difference(raw_values, 1)
@@ -144,11 +147,14 @@ if __name__ == '__main__':
 
     # split into train and test sets
     train_size = int(dataset.shape[0] * 0.8)
-    test_size = dataset.shape[0] - train_size
+    diff_length=dataset.shape[0]
+    test_size = diff_length - train_size
     train, test = dataset[0:train_size], dataset[train_size:]
 
     # transform the scale of the data
     scaler, train_scaled, test_scaled = scale(train, test)
+
+    
 
     # set random seed to 0
     np.random.seed(0)
@@ -164,7 +170,7 @@ if __name__ == '__main__':
     test_target = Variable(torch.from_numpy(test_target_scaled), requires_grad=False).cuda()
     # ----------------------------------------------------------------------------------------
     # hyper parameters
-    n_iters=2000
+    n_iters=200
     print_every=100
     plot_every=1
     learning_rate=0.001
@@ -224,42 +230,55 @@ if __name__ == '__main__':
         pre=pre.data.numpy()
         return pre
 
+    y_train=forecast(input=input,future_step=0)
+    y_train=y_train[:,-1]
+    y_train=invert_scale(scaler,input_scaled,y_train)
+
+    # invert differenced train value
+    def inverse_train_difference(history, y_train_prediction, interval=1):
+        ori = list()
+        # appended the base
+        for i in range(interval):
+            ori.append(history[i])
+        # appended the inverted diff
+        for i in range(len(y_train_prediction)):
+            value=y_train_prediction[i]+history[i]
+            ori.append(value)
+        return Series(ori).values
+
+    y_train=inverse_train_difference(raw_values,y_train)
+
     y_pred=forecast(input=test_input,future_step=0)
     y_pred=y_pred[:,-1]
     y_pred=invert_scale(scaler,test_input_scaled,y_pred)
     # invert differencing
-    y_pred=inverse_difference(raw_values,y_pred,len(test_scaled)+1)
+    # invert differenced value
+    def inverse_test_difference(history, Y_test_prediction, interval=1):
+        ori = list()
+        for i in range(len(Y_test_prediction)):
+            value=Y_test_prediction[i]+history[train_size+i]
+            ori.append(value)
+        return Series(ori).values
+    y_pred=inverse_test_difference(raw_values,y_pred)
     # # print forecast
     # for i in range(len(test)):
     #     print('Predicted=%f, Expected=%f' % ( y_pred[i], raw_values[-len(test)+i]))
-    raw_values_array=np.array(raw_values)
-    trian_length=len(train)
-    expected=raw_values_array[trian_length+1:].copy()
+    
 
-    plt.figure(figsize=(30,10))
+    train_scope=np.arange(train_size+1)
+    test_scope=np.arange(train_size+1,set_length)
+
+    plt.figure()
     plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=30)
     plt.xlabel('x', fontsize=20)
     plt.ylabel('y', fontsize=20)
     plt.xticks(fontsize=20)
     plt.yticks(fontsize=20)
-    time_period=np.arange(len(y_pred))
-    plt.plot(time_period,y_pred,color='blue',linestyle='--',label='Prediction')
-    plt.plot(time_period,expected,color='green',linestyle='-',label='Original')
-    plt.legend(loc='upper left')
-    plt.savefig('Prediction.png')
-    plt.show()    raw_values_array=np.array(raw_values)
-    trian_length=len(train)
-    expected=raw_values_array[trian_length+1:].copy()
+    time_period=np.arange(set_length)
+    plt.plot(time_period,ts_values_array,color='green',linestyle='-',label='Original')
+    plt.plot(train_scope,y_train,'b:',label='train')
+    plt.plot(test_scope,y_pred,'r:',label='prediction')
 
-    plt.figure(figsize=(30,10))
-    plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=30)
-    plt.xlabel('x', fontsize=20)
-    plt.ylabel('y', fontsize=20)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    time_period=np.arange(len(y_pred))
-    plt.plot(time_period,y_pred,color='blue',linestyle='--',label='Prediction')
-    plt.plot(time_period,expected,color='green',linestyle='-',label='Original')
     plt.legend(loc='upper left')
     plt.savefig('Prediction.png')
     plt.show()

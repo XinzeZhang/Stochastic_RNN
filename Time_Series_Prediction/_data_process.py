@@ -10,8 +10,10 @@ from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 from numpy import concatenate
 
+import math
+
+import matplotlib
 import matplotlib.ticker as ticker
-# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 # convert an array of values into a dataset matrix
@@ -30,7 +32,6 @@ def create_dataset(dataset, look_back=1):
 # create a differenced series
 def difference(dataset, interval=1):
     diff = list()
-    # diff.append(0)
     for i in range(interval, len(dataset)):
         value = dataset[i] - dataset[i - interval]
         diff.append(value)
@@ -70,10 +71,12 @@ def invert_scale(scaler, ori_array ,pred_array):
     return pred_array_inverted
 
 if __name__ == '__main__':
+    #------------------------------------------------------------------------
     # load dataset
     series = read_csv('chinese_oil_production.csv', header=0,
                     parse_dates=[0], index_col=0, squeeze=True)
-    #transfer the dataset to array
+
+    # transfer the dataset to array
     raw_values = series.values
     ts_values_array=np.array(raw_values)
     set_length=len(ts_values_array)
@@ -81,69 +84,70 @@ if __name__ == '__main__':
     # transform data to be stationary
     diff = difference(raw_values, 1)
 
-    # create differece_dataset x,y
+    # create dataset x,y
     dataset = diff.values
     dataset = create_dataset(dataset, look_back=1)
 
     # split into train and test sets
     train_size = int(dataset.shape[0] * 0.8)
-    train_scope=np.arange(train_size)
-    # test_size = dataset.shape[0] - train_size
-    test_scope= np.arange(train_size,set_length)
-    #-------------------------------------------------------------------
-    # divide the tf_values to train set and test set
-    tf_train=ts_values_array[:train_size].copy()
-    tf_expect=ts_values_array[train_size:].copy()
-    #--------------------------------------------------------------------
-    #divide the tf_values_diff to train set and test set
+    diff_length=dataset.shape[0]
+    test_size = diff_length - train_size
     train, test = dataset[0:train_size], dataset[train_size:]
-    tf_train_diff=train[:,:1]
-    tf_test_diff=test[:,:1]
-    tf_test_diff=np.insert(tf_test_diff,[-1],dataset[-1,-1])
-    #--------------------------------------------------------------------
+
     # transform the scale of the data
     scaler, train_scaled, test_scaled = scale(train, test)
-    # divided the train_set and test_set
-    tf_trian_scaled=train_scaled[:,:1]
-    tf_test_scaled=test_scaled[:,:1]
-    tf_test_scaled=np.insert(tf_test_scaled,[-1],test_scaled[-1,-1])
 
-    #=====================================================================
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    plt.figure(figsize=(60,60))    
-    # locate the sublabel
-    # draw the train set and test set
-    ax1=plt.subplot(311)
-    ax1.set_xticks(np.arange(0,set_length,10))
-    ax1.plot(train_scope, tf_train,'r',label='tf_train',linewidth = 1.0)
-    ax1.plot(test_scope, tf_expect,'r:',label='tf_expect',linewidth = 1.0)
-    ax1.minorticks_on()
-    ax1.grid(which='both')
-    ax1.legend(loc='upper right')
-    ax1.set_title('Values for Time Sequences')
-    plt.xlabel('Time Sequence' )
-    plt.ylabel('Value')
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    ax2=plt.subplot(312,sharex=ax1)
-    ax2.plot(train_scope, tf_train_diff,'g',label='tf_train_diff',linewidth = 1.0)
-    ax2.plot(test_scope, tf_test_diff,'g:',label='tf_expect_diff',linewidth = 1.0)
-    ax2.minorticks_on()
-    ax2.grid(which='both')
-    ax2.legend(loc='upper right')
-    ax2.set_title('Values_difference for Time Sequences')
-    plt.xlabel('Time Sequence')
-    plt.ylabel('Difference')
-    #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    ax3=plt.subplot(313,sharex=ax1)
-    ax3.plot(train_scope, tf_trian_scaled,'b',label='tf_train_diff_scaled',linewidth = 1.0)
-    ax3.plot(test_scope, tf_test_scaled,'b:',label='tf_expect_diff_scaled',linewidth = 1.0)
-    ax3.minorticks_on()
-    ax3.grid(which='both')
-    ax3.legend(loc='upper right')
-    ax3.set_title('Values_difference_scaled for Time Sequences')
-    plt.xlabel('Time Sequence')
-    plt.ylabel('Scaled Difference')
+    # -----------------------------------------------------------
+    input_scaled=train_scaled[:,:1]
 
-    plt.subplots_adjust(hspace=0.75)
-    plt.savefig('data_visualization.png')
+    Y_train=train_scaled[:,-1]
+    Y_train=invert_scale(scaler,input_scaled,Y_train)
+
+    # invert differenced train value
+    def inverse_train_difference(history, y_train_prediction, interval=1):
+        ori = list()
+        # appended the base
+        for i in range(interval):
+            ori.append(history[i])
+        # appended the inverted diff
+        for i in range(len(y_train_prediction)):
+            value=y_train_prediction[i]+history[i]
+            ori.append(value)
+        return Series(ori).values
+
+    Y_train=inverse_train_difference(raw_values,Y_train)
+
+    #----------------------------------------------------------
+    test_input_scaled=test_scaled[:, :1]
+    Y_pred=test_scaled[:,-1]
+    Y_pred=invert_scale(scaler,test_input_scaled,Y_pred)
+    # invert differenced value
+    def inverse_test_difference(history, Y_test_prediction, interval=1):
+        ori = list()
+        for i in range(len(Y_test_prediction)):
+            value=Y_test_prediction[i]+history[train_size+i]
+            ori.append(value)
+        return Series(ori).values
+    Y_pred=inverse_test_difference(raw_values,Y_pred)
+    # # print forecast
+    # for i in range(len(test)):
+    #     print('Predicted=%f, Expected=%f' % ( y_pred[i], raw_values[-len(test)+i]))
+    
+
+    train_scope=np.arange(train_size+1)
+    test_scope=np.arange(train_size+1,set_length)
+
+    plt.figure()
+    plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=30)
+    plt.xlabel('x', fontsize=20)
+    plt.ylabel('y', fontsize=20)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    time_period=np.arange(set_length)
+    plt.plot(time_period,ts_values_array,color='green',linestyle='-',label='Original')
+    plt.plot(train_scope,Y_train,'b:',label='train')
+    plt.plot(test_scope,Y_pred,'r:',label='prediction')
+
+    plt.legend(loc='upper left')
+    # plt.savefig('Prediction.png')
     plt.show()
