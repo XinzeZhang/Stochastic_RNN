@@ -94,15 +94,15 @@ def inverse_test_difference(history, Y_test_prediction, train_size,look_back):
 
 def plot_result(TS_values,Train_value,Pred_value):
     # get length from time-sequence 
-    ts_length=len(TS_values)
-    train_length=len(Train_value)
-    test_length=len(Pred_value)
-    look_back=ts_length-train_length-test_length-1
+    ts_size=len(TS_values)
+    train_size=len(Train_value)
+    test_size=len(Pred_value)
+    look_back=ts_size-train_size-test_size-1
 
-    time_period=np.arange(ts_length)
+    time_period=np.arange(ts_size)
     incept_scope=np.array(look_back+1)
     train_scope=np.arange(look_back+1,train_size+look_back+1)
-    test_scope=np.arange(train_size+look_back+1,ts_length)
+    test_scope=np.arange(train_size+look_back+1,ts_size)
 
     plt.figure(figsize=(30,5))
     plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=12)
@@ -111,12 +111,12 @@ def plot_result(TS_values,Train_value,Pred_value):
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10) 
     
-    plt.plot(time_period,TS_values,color='green',linestyle='-',label='Original')
-    plt.plot(train_scope,Train_value,'b^',label='train')
-    plt.plot(test_scope,Pred_value,'r>',label='prediction')
+    plt.plot(time_period,TS_values,'r-',label='Original')
+    plt.plot(train_scope,Train_value,'g--',label='train')
+    plt.plot(test_scope,Pred_value,'b--',label='prediction')
 
     plt.legend(loc='upper right')
-    # plt.savefig('Prediction.png')
+    plt.savefig('Prediction.png')
     plt.show()
 
 # time-transform

@@ -35,14 +35,14 @@ def lossPlot(points):
 class Sequence(nn.Module):
     def __init__(self):
         super(Sequence, self).__init__()
-        self.gru1 = nn.GRUCell(1, 50)
-        self.gru2 = nn.GRUCell(50, 50)
-        self.linear = nn.Linear(50, 1)
+        self.gru1 = nn.GRUCell(1, 500)
+        self.gru2 = nn.GRUCell(500, 500)
+        self.linear = nn.Linear(500, 1)
 
     def forward(self, input, future = 0):
         outputs = []
-        h_t = Variable(torch.zeros(input.size(0), 50).double(), requires_grad=False).cuda()
-        h_t2 = Variable(torch.zeros(input.size(0), 50).double(), requires_grad=False).cuda()
+        h_t = Variable(torch.zeros(input.size(0), 500).double(), requires_grad=False).cuda()
+        h_t2 = Variable(torch.zeros(input.size(0), 500).double(), requires_grad=False).cuda()
 
         for i,input_t in enumerate(input.chunk(input.size(1), dim=1)):
             h_t= self.gru1(input_t, h_t)
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------------------
     # hyper parameters
     n_iters=2000
-    print_every=100
+    print_every=50
     plot_every=1
     learning_rate=0.001
 
@@ -149,7 +149,7 @@ if __name__ == '__main__':
             plot_losses.append(plot_loss_avg)
             plot_loss_total = 0
 
-    # lossPlot(plot_losses)
+    lossPlot(plot_losses)
 
     #---------------------------------------------------------------------------------------
     # begin to forcast
@@ -163,9 +163,9 @@ if __name__ == '__main__':
         return pre
 
     # get train_result
-    Y_trian=forecast(input=input,future_step=0)
-    Y_trian=Y_trian[:,-1]
-    Y_trian=invert_scale(scaler,input_scaled,Y_trian)
+    Y_train=forecast(input=input,future_step=0)
+    Y_train=Y_train[:,-1]
+    Y_train=invert_scale(scaler,input_scaled,Y_train)
     Y_train=inverse_train_difference(raw_values,Y_train,ts_look_back)
 
     #get test_result

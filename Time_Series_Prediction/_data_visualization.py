@@ -146,4 +146,3 @@ if __name__ == '__main__':
 
     plt.subplots_adjust(hspace=0.75)
     plt.savefig('data_visualization.png')
-    plt.show()
