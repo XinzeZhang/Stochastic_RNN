@@ -35,10 +35,10 @@ def difference(dataset, interval=1):
     for i in range(interval, len(dataset)):
         value = dataset[i] - dataset[i - interval]
         diff.append(value)
-    return Series(diff)
+    return Series(diff).values
 
 # invert differenced value
-def inverse_difference(history, yhat, interval=1):
+def inverse_difference(hvalues, yhat, interval=1):
     ori = list()
     for i in range(len(yhat)):
         value=yhat[i]+history[-interval+i]
@@ -102,10 +102,9 @@ if __name__ == '__main__':
     set_length=len(ts_values_array)
 
     # transform data to be stationary
-    diff = difference(raw_values, 1)
+    dataset = difference(raw_values, 1)
 
     # create dataset x,y
-    dataset = diff.values
     ts_look_back=12
     dataset = create_dataset(dataset, look_back=ts_look_back)
 
