@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, look_back=1):
-    dataset = np.insert(dataset, [0] * look_back, 0)
+    # dataset = np.insert(dataset, [0] * look_back, 0)
     dataX, dataY = [], []
     for i in range(len(dataset) - look_back):
         a = dataset[i:(i + look_back)]
@@ -70,6 +70,26 @@ def invert_scale(scaler, ori_array ,pred_array):
     pred_array_inverted=inverted[:,-1]
     return pred_array_inverted
 
+# invert differenced train value
+def inverse_train_difference(history, y_train_prediction, look_back):
+    ori = list()
+    # # appended the base
+    # for i in range(look_back+1):
+    #     ori.append(history[i])
+    # appended the inverted diff
+    for i in range(len(y_train_prediction)):
+        value=y_train_prediction[i]+history[look_back+i]
+        ori.append(value)
+    return Series(ori).values
+
+# invert differenced value
+def inverse_test_difference(history, Y_test_prediction, train_size,look_back):
+    ori = list()
+    for i in range(len(Y_test_prediction)):
+        value=Y_test_prediction[i]+history[train_size+look_back+i]
+        ori.append(value)
+    return Series(ori).values
+
 if __name__ == '__main__':
     #------------------------------------------------------------------------
     # load dataset
@@ -103,40 +123,21 @@ if __name__ == '__main__':
 
     Y_train=train_scaled[:,-1]
     Y_train=invert_scale(scaler,input_scaled,Y_train)
-
-    # invert differenced train value
-    def inverse_train_difference(history, y_train_prediction, look_back=1):
-        ori = list()
-        # appended the base
-        for i in range(look_back):
-            ori.append(history[i])
-        # appended the inverted diff
-        for i in range(len(y_train_prediction)):
-            value=y_train_prediction[i]+history[i]
-            ori.append(value)
-        return Series(ori).values
-
-    Y_train=inverse_train_difference(raw_values,Y_train)
+    Y_train=inverse_train_difference(raw_values,Y_train,ts_look_back)
 
     #----------------------------------------------------------
     test_input_scaled=test_scaled[:, :-1]
     Y_pred=test_scaled[:,-1]
     Y_pred=invert_scale(scaler,test_input_scaled,Y_pred)
-    # invert differenced value
-    def inverse_test_difference(history, Y_test_prediction, train_size):
-        ori = list()
-        for i in range(len(Y_test_prediction)):
-            value=Y_test_prediction[i]+history[train_size+i]
-            ori.append(value)
-        return Series(ori).values
-    Y_pred=inverse_test_difference(raw_values,Y_pred,train_size)
+    Y_pred=inverse_test_difference(raw_values,Y_pred,train_size,ts_look_back)
     # # print forecast
     # for i in range(len(test)):
     #     print('Predicted=%f, Expected=%f' % ( y_pred[i], raw_values[-len(test)+i]))
     
-
-    train_scope=np.arange(train_size+1)
-    test_scope=np.arange(train_size+1,set_length)
+    time_period=np.arange(set_length)
+    incept_scope=np.array(ts_look_back+1)
+    train_scope=np.arange(ts_look_back+1,train_size+ts_look_back+1)
+    test_scope=np.arange(train_size+ts_look_back+1,set_length)
 
     plt.figure(figsize=(60,10))
     plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=30)
@@ -144,11 +145,11 @@ if __name__ == '__main__':
     plt.ylabel('y', fontsize=15)
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
-    time_period=np.arange(set_length)
+    
     plt.plot(time_period,ts_values_array,color='green',linestyle='-',label='Original')
-    plt.plot(train_scope,Y_train,'b:',label='train')
-    plt.plot(test_scope,Y_pred,'r:',label='prediction')
+    plt.plot(train_scope,Y_train,'b^',label='train')
+    plt.plot(test_scope,Y_pred,'r>',label='prediction')
 
-    plt.legend(loc='upper left')
+    plt.legend(loc='upper right')
     # plt.savefig('Prediction.png')
     plt.show()
