@@ -19,63 +19,7 @@ import torch.optim as optim
 
 import time
 
-import matplotlib
-import matplotlib.ticker as ticker
-import matplotlib.pyplot as plt
-
-# convert an array of values into a dataset matrix
-def create_dataset(dataset, look_back=1):
-    dataset = np.insert(dataset, [0] * look_back, 0)
-    dataX, dataY = [], []
-    for i in range(len(dataset) - look_back):
-        a = dataset[i:(i + look_back)]
-        dataX.append(a)
-        dataY.append(dataset[i + look_back])
-    dataY = np.array(dataY)
-    dataY = np.reshape(dataY, (dataY.shape[0], 1))
-    dataset = np.concatenate((dataX, dataY), axis=1)
-    return dataset
-
-# create a differenced series
-def difference(dataset, interval=1):
-    diff = list()
-    for i in range(interval, len(dataset)):
-        value = dataset[i] - dataset[i - interval]
-        diff.append(value)
-    return Series(diff)
-
-# invert differenced value
-def inverse_difference(history, yhat, interval=1):
-    ori = list()
-    for i in range(len(yhat)):
-        value=yhat[i]+history[-interval+i]
-        ori.append(value)
-    return Series(ori).values
-
-# scale train and test data to [-1, 1]
-def scale(train, test):
-    # fit scaler
-    scaler = MinMaxScaler(feature_range=(-1, 1))
-    scaler = scaler.fit(train)
-    # transform train
-    train = train.reshape(train.shape[0], train.shape[1])
-    train_scaled = scaler.transform(train)
-    # transform test
-    test = test.reshape(test.shape[0], test.shape[1])
-    test_scaled = scaler.transform(test)
-    return scaler, train_scaled, test_scaled
-
-# inverse scaling for a forecasted value
-def invert_scale(scaler, ori_array ,pred_array):
-    # reshape the array to 2D
-    pred_array=pred_array.reshape(pred_array.shape[0],1)
-    ori_array=ori_array.reshape(ori_array.shape[0],1)
-    # maintain the broadcast shape with scaler
-    pre_inverted=concatenate((ori_array, pred_array), axis=1)
-    inverted = scaler.inverse_transform(pre_inverted)
-    # extraction the pred_array_inverted
-    pred_array_inverted=inverted[:,-1]
-    return pred_array_inverted
+from _data_process import *
 
 # show loss
 def lossPlot(points):
@@ -113,20 +57,6 @@ class Sequence(nn.Module):
         outputs = torch.stack(outputs, 1).squeeze(2).cuda()
         return outputs
 
-def asMinutes(s):
-    m = math.floor(s / 60)
-    s -= m * 60
-    return '%dm %ds' % (m, s)
-
-def timeSince(since, percent):
-    now = time.time()
-    s = now - since
-    es = s / (percent)
-    rs = es - s
-    return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
-
-
-
 if __name__ == '__main__':
     #------------------------------------------------------------------------
     # load dataset
@@ -139,11 +69,11 @@ if __name__ == '__main__':
     set_length=len(ts_values_array)
 
     # transform data to be stationary
-    diff = difference(raw_values, 1)
+    dataset = difference(raw_values, 1)
 
-    # create dataset x,y
-    dataset = diff.values
-    dataset = create_dataset(dataset, look_back=1)
+    #creat dataset train, test
+    ts_look_back=12
+    dataset = create_dataset(dataset, look_back=ts_look_back)
 
     # split into train and test sets
     train_size = int(dataset.shape[0] * 0.8)
@@ -154,23 +84,23 @@ if __name__ == '__main__':
     # transform the scale of the data
     scaler, train_scaled, test_scaled = scale(train, test)
 
-    
-
     # set random seed to 0
     np.random.seed(0)
     torch.manual_seed(0)
+    # ---------------------------------------------------------------------------------------
     # load data and make training set
-    input_scaled=train_scaled[:,:1]
+    input_scaled=train_scaled[:,:-1]
     input = Variable(torch.from_numpy(input_scaled),requires_grad=False).cuda()
     target_scaled=train_scaled[:,1:]
     target= Variable(torch.from_numpy(target_scaled),requires_grad=False).cuda()
-    test_input_scaled=test_scaled[:, :1]
+
+    test_input_scaled=test_scaled[:, :-1]
     test_input = Variable(torch.from_numpy(test_input_scaled), requires_grad=False).cuda()
     test_target_scaled=test_scaled[:, 1:]
     test_target = Variable(torch.from_numpy(test_target_scaled), requires_grad=False).cuda()
     # ----------------------------------------------------------------------------------------
     # hyper parameters
-    n_iters=200
+    n_iters=2000
     print_every=100
     plot_every=1
     learning_rate=0.001
@@ -193,19 +123,21 @@ if __name__ == '__main__':
     print_loss_total = 0  # Reset every print_every
     plot_loss_total = 0  # Reset every plot_every
     
+    # compute the MSE and record the loss
+    def closure():
+        optimizer.zero_grad()
+        out = seq(input)
+        loss = criterion(out, target)
+        global plot_loss_total
+        global print_loss_total
+        plot_loss_total+=loss.data[0]
+        print_loss_total+=loss.data[0]
+        loss.backward()
+        return loss
+
     #begin to train
     for iter in range(1, n_iters+1):
-        # compute the MSE and record the loss
-        def closure():
-            optimizer.zero_grad()
-            out = seq(input)
-            loss = criterion(out, target)
-            global plot_loss_total
-            global print_loss_total
-            plot_loss_total+=loss.data[0]
-            print_loss_total+=loss.data[0]
-            loss.backward()
-            return loss
+
         optimizer.step(closure)
         if iter % print_every == 0:
             print_loss_avg = print_loss_total / print_every
@@ -230,55 +162,20 @@ if __name__ == '__main__':
         pre=pre.data.numpy()
         return pre
 
-    y_train=forecast(input=input,future_step=0)
-    y_train=y_train[:,-1]
-    y_train=invert_scale(scaler,input_scaled,y_train)
+    # get train_result
+    Y_trian=forecast(input=input,future_step=0)
+    Y_trian=Y_trian[:,-1]
+    Y_trian=invert_scale(scaler,input_scaled,Y_trian)
+    Y_train=inverse_train_difference(raw_values,Y_train,ts_look_back)
 
-    # invert differenced train value
-    def inverse_train_difference(history, y_train_prediction, interval=1):
-        ori = list()
-        # appended the base
-        for i in range(interval):
-            ori.append(history[i])
-        # appended the inverted diff
-        for i in range(len(y_train_prediction)):
-            value=y_train_prediction[i]+history[i]
-            ori.append(value)
-        return Series(ori).values
+    #get test_result
+    Y_pred=forecast(input=test_input,future_step=0)
+    Y_pred=Y_pred[:,-1]
+    Y_pred=inverse_test_difference(raw_values,Y_pred,train_size,ts_look_back)
 
-    y_train=inverse_train_difference(raw_values,y_train)
-
-    y_pred=forecast(input=test_input,future_step=0)
-    y_pred=y_pred[:,-1]
-    y_pred=invert_scale(scaler,test_input_scaled,y_pred)
-    # invert differencing
-    # invert differenced value
-    def inverse_test_difference(history, Y_test_prediction, interval=1):
-        ori = list()
-        for i in range(len(Y_test_prediction)):
-            value=Y_test_prediction[i]+history[train_size+i]
-            ori.append(value)
-        return Series(ori).values
-    y_pred=inverse_test_difference(raw_values,y_pred)
     # # print forecast
     # for i in range(len(test)):
     #     print('Predicted=%f, Expected=%f' % ( y_pred[i], raw_values[-len(test)+i]))
     
 
-    train_scope=np.arange(train_size+1)
-    test_scope=np.arange(train_size+1,set_length)
-
-    plt.figure()
-    plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=30)
-    plt.xlabel('x', fontsize=20)
-    plt.ylabel('y', fontsize=20)
-    plt.xticks(fontsize=20)
-    plt.yticks(fontsize=20)
-    time_period=np.arange(set_length)
-    plt.plot(time_period,ts_values_array,color='green',linestyle='-',label='Original')
-    plt.plot(train_scope,y_train,'b:',label='train')
-    plt.plot(test_scope,y_pred,'r:',label='prediction')
-
-    plt.legend(loc='upper left')
-    plt.savefig('Prediction.png')
-    plt.show()
+    plot_result(TS_values=ts_values_array,Train_value=Y_train,Pred_value=Y_pred)
