@@ -62,7 +62,7 @@ def scale(train, test):
 def invert_scale(scaler, ori_array ,pred_array):
     # reshape the array to 2D
     pred_array=pred_array.reshape(pred_array.shape[0],1)
-    ori_array=ori_array.reshape(ori_array.shape[0],1)
+    ori_array=ori_array.reshape(ori_array.shape[0],ori_array.shape[1])
     # maintain the broadcast shape with scaler
     pre_inverted=concatenate((ori_array, pred_array), axis=1)
     inverted = scaler.inverse_transform(pre_inverted)
@@ -86,7 +86,8 @@ if __name__ == '__main__':
 
     # create dataset x,y
     dataset = diff.values
-    dataset = create_dataset(dataset, look_back=1)
+    ts_look_back=12
+    dataset = create_dataset(dataset, look_back=ts_look_back)
 
     # split into train and test sets
     train_size = int(dataset.shape[0] * 0.8)
@@ -98,16 +99,16 @@ if __name__ == '__main__':
     scaler, train_scaled, test_scaled = scale(train, test)
 
     # -----------------------------------------------------------
-    input_scaled=train_scaled[:,:1]
+    input_scaled=train_scaled[:,:-1]
 
     Y_train=train_scaled[:,-1]
     Y_train=invert_scale(scaler,input_scaled,Y_train)
 
     # invert differenced train value
-    def inverse_train_difference(history, y_train_prediction, interval=1):
+    def inverse_train_difference(history, y_train_prediction, look_back=1):
         ori = list()
         # appended the base
-        for i in range(interval):
+        for i in range(look_back):
             ori.append(history[i])
         # appended the inverted diff
         for i in range(len(y_train_prediction)):
@@ -118,17 +119,17 @@ if __name__ == '__main__':
     Y_train=inverse_train_difference(raw_values,Y_train)
 
     #----------------------------------------------------------
-    test_input_scaled=test_scaled[:, :1]
+    test_input_scaled=test_scaled[:, :-1]
     Y_pred=test_scaled[:,-1]
     Y_pred=invert_scale(scaler,test_input_scaled,Y_pred)
     # invert differenced value
-    def inverse_test_difference(history, Y_test_prediction, interval=1):
+    def inverse_test_difference(history, Y_test_prediction, train_size):
         ori = list()
         for i in range(len(Y_test_prediction)):
             value=Y_test_prediction[i]+history[train_size+i]
             ori.append(value)
         return Series(ori).values
-    Y_pred=inverse_test_difference(raw_values,Y_pred)
+    Y_pred=inverse_test_difference(raw_values,Y_pred,train_size)
     # # print forecast
     # for i in range(len(test)):
     #     print('Predicted=%f, Expected=%f' % ( y_pred[i], raw_values[-len(test)+i]))
@@ -137,7 +138,7 @@ if __name__ == '__main__':
     train_scope=np.arange(train_size+1)
     test_scope=np.arange(train_size+1,set_length)
 
-    plt.figure()
+    plt.figure(figsize=(60,10))
     plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=30)
     plt.xlabel('x', fontsize=20)
     plt.ylabel('y', fontsize=20)
