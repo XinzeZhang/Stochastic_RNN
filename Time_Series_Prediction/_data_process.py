@@ -92,7 +92,7 @@ def inverse_test_difference(history, Y_test_prediction, train_size,look_back):
         ori.append(value)
     return Series(ori).values
 
-def plot_result(TS_values,Train_value,Pred_value):
+def plot_result(TS_values,Train_value,Pred_value,Loss_pred,Fig_name='Prediction'):
     # get length from time-sequence 
     ts_size=len(TS_values)
     train_size=len(Train_value)
@@ -106,6 +106,7 @@ def plot_result(TS_values,Train_value,Pred_value):
 
     plt.figure(figsize=(30,5))
     plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=12)
+    plt.title('MSE of Prediction:'+str(Loss_pred),loc='right',fontsize=12)
     plt.xlabel('x', fontsize=10)
     plt.ylabel('y', fontsize=10)
     plt.xticks(fontsize=10)
@@ -116,7 +117,7 @@ def plot_result(TS_values,Train_value,Pred_value):
     plt.plot(test_scope,Pred_value,'b--',label='prediction')
 
     plt.legend(loc='upper right')
-    plt.savefig('Prediction.png')
+    plt.savefig('./Result/'+Fig_name+'.png')
     plt.show()
 
 # time-transform
@@ -132,6 +133,17 @@ def timeSince(since, percent):
     es = s / (percent)
     rs = es - s
     return '%s (- %s)' % (asMinutes(s), asMinutes(rs))
+
+# show loss
+def plot_loss(points,Fig_name):
+    plt.figure()
+    # fig, ax = plt.subplots()
+    # # this locator puts ticks at regular intervals
+    # loc = ticker.MultipleLocator(base=0.2)
+    # ax.yaxis.set_major_locator(loc)
+    plt.plot(points)
+    plt.savefig('./Result/'+Fig_name+'.png')
+    plt.close()
 
 if __name__ == '__main__':
     #------------------------------------------------------------------------
