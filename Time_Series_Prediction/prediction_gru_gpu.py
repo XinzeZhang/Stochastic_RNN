@@ -30,6 +30,7 @@ class Sequence(nn.Module):
         self.output_size=Output_size
         
         self.gru1 = nn.GRUCell(self.input_size, self.hidden_size)
+        
         self.gru2=nn.GRUCell(self.hidden_size,self.hidden_size)
         # self.gru2 = nn.GRUCell(500, 500)
         self.linear = nn.Linear(self.hidden_size, self.output_size)
@@ -43,6 +44,8 @@ class Sequence(nn.Module):
         # h_t2 = Variable(torch.zeros(input.size(0), 50).double(), requires_grad=False).cuda()
 
         for i, input_t in enumerate(input.chunk(input.size(1), dim=1)):
+            #input (batch, input_size): tensor containing input features
+            #hidden (batch, hidden_size): tensor containing the initial hidden state for each element in the batch.
             h_t= nn.functional.relu((self.gru1(input_t, h_t)))
             # h_t2 = self.gru2(h_t, h_t2)
             output = self.linear(h_t)
@@ -52,7 +55,8 @@ class Sequence(nn.Module):
             # h_t2 = self.gru2(h_t, h_t2)
             output = self.linear(h_t)
             outputs += [output]
-        outputs = torch.stack(outputs, 1).squeeze(2).cuda()
+        outputs_T=torch.stack(outputs, 1).cuda()
+        outputs = outputs_T.squeeze(2).cuda()
         return outputs
     
     # def initHidden(self,input):
@@ -87,6 +91,8 @@ if __name__ == '__main__':
 
     # transform the scale of the data
     scaler, train_scaled, test_scaled = scale(train, test)
+    # train_scaled :: shape:[train_num,seq_len] which meams [batch, input_size]
+    # test_scaled :: shape:[train_num,seq_len] which meams [batch, input_size]
 
     # set random seed to 0
     np.random.seed(0)
