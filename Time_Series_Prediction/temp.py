@@ -40,16 +40,21 @@ class RNN(nn.Module):
         r_out, h_state = self.rnn(input, h_state)
 
         outs = []    # save all predictions
-        for time_step in range(r_out.size(1)):    # calculate output for each time step
-            outs.append(self.out(r_out[:, time_step, :]))
+        for time_step in range(r_out.size(1)):
+            r_out_time_step =r_out[:, time_step, :]  # calculate output for each time step
+            outs.append(self.out(r_out_time_step))
         return torch.stack(outs, dim=1), h_state
+        # h_state=h_state.view(input.size(0),32)
+        # fcoutputs=self.out(h_state)
+
+        # return fcoutputs, h_state
 
         # instead, for simplicity, you can replace above codes by follows
         # r_out = r_out.view(-1, 32)
         # outs = self.out(r_out)
         # return outs, h_state
 
-rnn = RNN()
+rnn = RNN().cuda()
 print(rnn)
 
 optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)   # optimize all rnn parameters
@@ -66,11 +71,15 @@ for step in range(120):
     steps = np.linspace(start, end, TIME_STEP, dtype=np.float32)
     x_np = np.sin(steps)    # float32 for converting torch FloatTensor
     y_np = np.cos(steps)
-    
+    # plt.plot(steps, y_np, 'r-', label='target (cos)')
+    # plt.plot(steps, x_np, 'b-', label='input (sin)')
+    # plt.legend(loc='best')
+    # plt.show()
+
     x_np_reshape=x_np[np.newaxis, :, np.newaxis]    # shape (batch, time_step, input_size)
-    x = Variable(torch.from_numpy(x_np_reshape))    # shape (batch, time_step, input_size)
+    x = Variable(torch.from_numpy(x_np_reshape)).cuda()    # shape (batch, time_step, input_size)
     y_np_reshape=y_np[np.newaxis, :, np.newaxis]
-    y = Variable(torch.from_numpy(y_np_reshape))
+    y = Variable(torch.from_numpy(y_np_reshape)).cuda()
 
     prediction, h_state = rnn(x, h_state)   # rnn output
     # !! next step is important !!
@@ -83,7 +92,7 @@ for step in range(120):
 
     # plotting
     plt.plot(steps, y_np.flatten(), 'r-')
-    plt.plot(steps, prediction.data.numpy().flatten(), 'b-')
+    plt.plot(steps, prediction.cpu().data.numpy().flatten(), 'b-')
     plt.draw(); plt.pause(0.05)
 
 plt.ioff()

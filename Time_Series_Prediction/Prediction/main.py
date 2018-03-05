@@ -59,65 +59,36 @@ if __name__ == '__main__':
     torch.manual_seed(0)
     # ---------------------------------------------------------------------------------------
     # load data and make training set
-    train_input_scaled = train_scaled[:, :-1,np.newaxis]
+    train_input_scaled = train_scaled[:, :-1, np.newaxis]
     train_input = Variable(torch.from_numpy(
-        train_input_scaled), requires_grad=False).cuda()
-    train_target_scaled = train_scaled[:, 1:,np.newaxis]
-    train_target = Variable(torch.from_numpy(
-        train_target_scaled), requires_grad=False).cuda()
+        train_input_scaled), requires_grad=False)
 
-    test_input_scaled = test_scaled[:, :-1,np.newaxis]
+    train_target_scaled = train_scaled[:, 1:]
+    train_target = Variable(torch.from_numpy(
+        train_target_scaled), requires_grad=False)
+
+    test_input_scaled = test_scaled[:, :-1, np.newaxis]
     test_input = Variable(torch.from_numpy(
-        test_input_scaled), requires_grad=False).cuda()
-    test_target_scaled = test_scaled[:, 1:,np.newaxis]
+        test_input_scaled), requires_grad=False)
+
+    test_target_scaled = test_scaled[:, 1:]
     test_target = Variable(torch.from_numpy(
-        test_target_scaled), requires_grad=False).cuda()
-    
+        test_target_scaled), requires_grad=False)
+
     # ========================================================================================
     # hyper parameters
-    n_iters = 6000
-    hidden_size=500
+    Num_layers = 2
+    Num_iters = 6
+    hidden_size = 500
     print_every = 50
     plot_every = 1
     learning_rate = 0.1
+    # ========================================================================================
 
-    seq=GRUModel(inputDim=1,Hidden_size=hidden_size,outputDim=1,layerNum=1,cell="GRU")
-    # define the loss
-    criterion = nn.MSELoss()
-    # use LBFGS/SGD as optimizer since we can load the whole data to train
-    # optimizer = optim.LBFGS(seq.parameters(), lr=learning_rate)
-    optimizer = optim.SGD(seq.parameters(), lr=learning_rate)
+    GRU_demo = GRUModel(input_dim=1, hidden_size=1, output_dim=1, num_layers=1, cell="GRU", num_iters=2, learning_rate = 0.01, print_interval=50, plot_interval=1)
+    GRU_demo.fit(train_input,train_target)
+    #---------------------------------------------------------------------------------------
+    # begin to forcast
+    print('Forecasting Testing Data')
 
-        # Initialize timer
-    time_tr_start = time.time()
-
-    plot_losses = []
-    print_loss_total = 0  # Reset every print_every
-    plot_loss_total = 0  # Reset every plot_every
-
-    # compute the MSE and record the loss
-    def closure():
-        optimizer.zero_grad()
-        out = seq(train_input)
-        loss = criterion(out, train_target)
-        global plot_loss_total
-        global print_loss_total
-        plot_loss_total += loss.data[0]
-        print_loss_total += loss.data[0]
-        loss.backward()
-        return loss
-
-    # begin to train
-    for iter in range(1, n_iters + 1):
-        optimizer.step(closure)
-        if iter % print_every == 0:
-            print_loss_avg = print_loss_total / print_every
-            print_loss_total = 0
-            print('%s (%d %d%%) %.8f' % (timeSince(time_tr_start, iter / n_iters),
-                                         iter, iter / n_iters * 100, print_loss_avg))
-        if iter % plot_every == 0:
-            plot_loss_avg = plot_loss_total / plot_every
-            plot_losses.append(plot_loss_avg)
-            plot_loss_total = 0
-
-    plot_loss(plot_losses, Fig_name='L1_H'+str(hidden_size)+'_I'+str(n_iters)+'_Loss')
+    
