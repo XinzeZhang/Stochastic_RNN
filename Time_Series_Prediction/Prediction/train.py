@@ -9,18 +9,9 @@ from sklearn.utils import shuffle
 import pickle as p
 import time
 
-def customLoss(pred, fcOutput1, fcOutput2, residual, convWeight, y):
-
-    lamda1 = 0.01
-    lamda2 = 2.0
-    lamda3 = 0.1
-
+def MSE_Loss(pred, y):
     criterion = nn.MSELoss()
     loss = criterion(pred, y)
-    #print(convWeight)
-    #print(torch.norm(convWeight, 2))
-    # lamda3*torch.norm(residual, 2)
-    #lamda1 * criterion(fcOutput1, y) + lamda2 * criterion(fcOutput2, y)
     return loss
 
 def train(trainX, trainY, epoch, lr, batchSize, modelPath, lookBack, method):
@@ -78,10 +69,10 @@ def train(trainX, trainY, epoch, lr, batchSize, modelPath, lookBack, method):
             optimizer.zero_grad()
 
             if method == "new":
-                pred, fcOutput1, fcOutput2, resdiual = net.forward(x, batchSize=batchSize)
-                criterion = nn.MSELoss()
+                pred = net.forward(x, batchSize=batchSize)
+                # criterion = nn.MSELoss()
                 #loss = criterion(pred, y)
-                loss = customLoss(pred, fcOutput1, fcOutput2, resdiual, net.convWeight, y)
+                loss = MSE_Loss(pred, y)
             else:
                 pred = net.forward(x, batchSize=batchSize)
                 criterion = nn.MSELoss()

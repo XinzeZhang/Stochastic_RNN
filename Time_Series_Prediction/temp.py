@@ -52,7 +52,7 @@ class RNN(nn.Module):
 rnn = RNN()
 print(rnn)
 
-optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)   # optimize all cnn parameters
+optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)   # optimize all rnn parameters
 loss_func = nn.MSELoss()
 
 h_state = None      # for initial hidden state
@@ -60,15 +60,17 @@ h_state = None      # for initial hidden state
 plt.figure(1, figsize=(12, 5))
 plt.ion()           # continuously plot
 
-for step in range(60):
+for step in range(120):
     start, end = step * np.pi, (step+1)*np.pi   # time range
     # use sin predicts cos
     steps = np.linspace(start, end, TIME_STEP, dtype=np.float32)
     x_np = np.sin(steps)    # float32 for converting torch FloatTensor
     y_np = np.cos(steps)
-
-    x = Variable(torch.from_numpy(x_np[np.newaxis, :, np.newaxis]))    # shape (batch, time_step, input_size)
-    y = Variable(torch.from_numpy(y_np[np.newaxis, :, np.newaxis]))
+    
+    x_np_reshape=x_np[np.newaxis, :, np.newaxis]    # shape (batch, time_step, input_size)
+    x = Variable(torch.from_numpy(x_np_reshape))    # shape (batch, time_step, input_size)
+    y_np_reshape=y_np[np.newaxis, :, np.newaxis]
+    y = Variable(torch.from_numpy(y_np_reshape))
 
     prediction, h_state = rnn(x, h_state)   # rnn output
     # !! next step is important !!
