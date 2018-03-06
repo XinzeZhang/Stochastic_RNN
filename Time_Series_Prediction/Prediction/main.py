@@ -78,17 +78,56 @@ if __name__ == '__main__':
     # ========================================================================================
     # hyper parameters
     Num_layers = 2
-    Num_iters = 6
-    hidden_size = 500
-    print_every = 50
-    plot_every = 1
-    learning_rate = 0.1
-    # ========================================================================================
+    Num_iters = 60
+    Hidden_size = 500
+    Print_interval = 50
+    Plot_interval = 1
+    Learning_rate = 0.1
+    Cell="GRU"
 
-    GRU_demo = GRUModel(input_dim=1, hidden_size=1, output_dim=1, num_layers=1, cell="GRU", num_iters=2, learning_rate = 0.01, print_interval=50, plot_interval=1)
-    GRU_demo.fit(train_input,train_target)
+    GRU_demo = GRUModel(input_dim=1,
+                        hidden_size=Hidden_size,
+                        output_dim=1,
+                        num_layers=Num_layers,
+                        cell=Cell,
+                        num_iters=Num_iters,
+                        learning_rate=Learning_rate,
+                        print_interval=Print_interval,
+                        plot_interval=Plot_interval)
+    # ========================================================================================
+    GRU_demo.fit_view(train_input, train_target)
     #---------------------------------------------------------------------------------------
     # begin to forcast
     print('Forecasting Testing Data')
 
-    
+    Y_train = GRU_demo.predict(train_input)
+    Y_train = Y_train[:, -1]
+    # inverse the train pred
+    Y_train = invert_scale(scaler, train_input_scaled, Y_train)
+    Y_train = inverse_train_difference(raw_values, Y_train, ts_look_back)
+
+    # get test_result
+    Y_pred = GRU_demo.predict(test_input)
+    Y_pred = Y_pred[:, -1]
+    Y_target = test_target_scaled[:, -1]
+
+    # get prediction loss
+    MSE_loss = nn.MSELoss()
+    Y_pred_torch = Variable(torch.from_numpy(Y_pred), requires_grad=False)
+    Y_target_torch = Variable(torch.from_numpy(Y_target), requires_grad=False)
+    MSE_pred = MSE_loss(Y_pred_torch, Y_target_torch)
+    MSE_pred = MSE_pred.data.numpy()
+    # inverse the test pred
+    Y_pred = invert_scale(scaler, test_input_scaled, Y_pred)
+    Y_pred = inverse_test_difference(
+        raw_values, Y_pred, train_size, ts_look_back)
+
+    # # print forecast
+    # for i in range(len(test)):
+    #     print('Predicted=%f, Expected=%f' % ( y_pred[i], raw_values[-len(test)+i]))
+
+    plot_result(TS_values=ts_values_array,
+                Train_value=Y_train,
+                Pred_value=Y_pred,
+                Loss_pred=MSE_pred,
+                Fig_name='Prediction' + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters))
