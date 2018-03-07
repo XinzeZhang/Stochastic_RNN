@@ -78,11 +78,11 @@ if __name__ == '__main__':
     # ========================================================================================
     # hyper parameters
     Num_layers = 2
-    Num_iters = 60
+    Num_iters = 6000
     Hidden_size = 500
     Print_interval = 50
     Plot_interval = 1
-    Learning_rate = 0.1
+    Learning_rate = 0.5
     Cell="GRU"
 
     GRU_demo = GRUModel(input_dim=1,

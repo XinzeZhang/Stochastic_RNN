@@ -1,69 +1,86 @@
-"""
-========================
-MATPLOTLIB **UNCHAINED**
-========================
-
-Comparative path demonstration of frequency from a fake signal of a pulsar.
-(mostly known because of the cover for Joy Division's Unknown Pleasures)
-
-Author: Nicolas P. Rougier
-"""
+from numpy import sin, cos
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.integrate as integrate
 import matplotlib.animation as animation
 
-# Create new Figure with black background
-fig = plt.figure(figsize=(8, 8))
-
-# Add a subplot with no frame
-ax = plt.subplot(111, frameon=False)
-
-# Generate random data
-data = np.random.uniform(0, 1, (64, 75))
-X = np.linspace(-1, 1, data.shape[-1])
-G = 1.5 * np.exp(-4 * X * X)
-
-# Generate line plots
-lines = []
-for i in range(len(data)):
-    # Small reduction of the X extents to get a cheap perspective effect
-    xscale = 1 - i / 200.
-    # Same for linewidth (thicker strokes on bottom)
-    lw = 1.5 - i / 100.0
-    line, = ax.plot(xscale * X, i + G * data[i], 'r-')
-    lines.append(line)
-
-# Set y limit (or first line is cropped because of thickness)
-ax.set_ylim(-1, 70)
-
-# No ticks
-ax.set_xticks([])
-ax.set_yticks([])
-
-# 2 part titles to get different font weights
-ax.text(0.5, 1.0, "MATPLOTLIB ", transform=ax.transAxes,
-        ha="right", va="bottom", color="w",
-        family="sans-serif", fontweight="light", fontsize=16)
-ax.text(0.5, 1.0, "UNCHAINED", transform=ax.transAxes,
-        ha="left", va="bottom", color="w",
-        family="sans-serif", fontweight="bold", fontsize=16)
+G = 9.8  # acceleration due to gravity, in m/s^2
+L1 = 1.0  # length of pendulum 1 in m
+L2 = 1.0  # length of pendulum 2 in m
+M1 = 1.0  # mass of pendulum 1 in kg
+M2 = 1.0  # mass of pendulum 2 in kg
 
 
-def update(*args):
-    # Shift all data to the right
-    data[:, 1:] = data[:, :-1]
+def derivs(state, t):
 
-    # Fill-in new values
-    data[:, 0] = np.random.uniform(0, 1, len(data))
+    dydx = np.zeros_like(state)
+    dydx[0] = state[1]
 
-    # Update data
-    for i in range(len(data)):
-        lines[i].set_ydata(i + G * data[i])
+    del_ = state[2] - state[0]
+    den1 = (M1 + M2)*L1 - M2*L1*cos(del_)*cos(del_)
+    dydx[1] = (M2*L1*state[1]*state[1]*sin(del_)*cos(del_) +
+               M2*G*sin(state[2])*cos(del_) +
+               M2*L2*state[3]*state[3]*sin(del_) -
+               (M1 + M2)*G*sin(state[0]))/den1
 
-    # Return modified artists
-    return lines
+    dydx[2] = state[3]
 
-# Construct the animation, using the update function as the animation
-# director.
-anim = animation.FuncAnimation(fig, update, interval=10)
+    den2 = (L2/L1)*den1
+    dydx[3] = (-M2*L2*state[3]*state[3]*sin(del_)*cos(del_) +
+               (M1 + M2)*G*sin(state[0])*cos(del_) -
+               (M1 + M2)*L1*state[1]*state[1]*sin(del_) -
+               (M1 + M2)*G*sin(state[2]))/den2
+
+    return dydx
+
+# create a time array from 0..100 sampled at 0.05 second steps
+dt = 0.05
+t = np.arange(0.0, 20, dt)
+
+# th1 and th2 are the initial angles (degrees)
+# w10 and w20 are the initial angular velocities (degrees per second)
+th1 = 120.0
+w1 = 0.0
+th2 = -10.0
+w2 = 0.0
+
+# initial state
+state = np.radians([th1, w1, th2, w2])
+
+# integrate your ODE using scipy.integrate.
+y = integrate.odeint(derivs, state, t)
+
+x1 = L1*sin(y[:, 0])
+y1 = -L1*cos(y[:, 0])
+
+x2 = L2*sin(y[:, 2]) + x1
+y2 = -L2*cos(y[:, 2]) + y1
+
+fig = plt.figure()
+ax = fig.add_subplot(111, autoscale_on=False, xlim=(-2, 2), ylim=(-2, 2))
+ax.set_aspect('equal')
+ax.grid()
+
+line, = ax.plot([], [], 'o-', lw=2)
+time_template = 'time = %.1fs'
+time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+
+
+def init():
+    line.set_data([], [])
+    time_text.set_text('')
+    return line, time_text
+
+
+def animate(i):
+    thisx = [0, x1[i], x2[i]]
+    thisy = [0, y1[i], y2[i]]
+
+    line.set_data(thisx, thisy)
+    time_text.set_text(time_template % (i*dt))
+    return line, time_text
+
+ani = animation.FuncAnimation(fig, animate, np.arange(1, len(y)),
+                              interval=25, blit=True, init_func=init)
+
 plt.show()

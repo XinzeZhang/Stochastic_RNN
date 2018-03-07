@@ -169,7 +169,7 @@ class GRUModel(BaseModel):
         target_size=target.size(0)# continuously plot
         time_period=np.arange(target_size)# continuously plot
         fig=plt.figure(figsize=(25,5))
-        ax=plt.subplot(111,frameon=False)
+        ax=plt.subplot(111)
 
         lines = []
         target_view=target[:,-1].data.numpy().flatten()
@@ -181,48 +181,47 @@ class GRUModel(BaseModel):
         # No ticks
         ax.set_xticks([])
         ax.set_yticks([])
+        text_template='Iter = %s'
+        text_iter=ax.text(0.05, 0.9, '', transform=ax.transAxes)
 
-        def update(*args):
+        def update(iter):
             # update data
-            for iter in range(1,self.Num_iters+1):
-                prediction, self.GRU_h_state = self.forward(input,self.GRU_h_state)
-                self.GRU_h_state=Variable(self.GRU_h_state.data)
-                loss = criterion(prediction, target)
-                self.plot_loss_total += loss.data[0]
-                self.print_loss_total += loss.data[0]
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+            # for iter in range(1,self.Num_iters+1):
+            iter=iter+1
+            prediction, self.GRU_h_state = self.forward(input,self.GRU_h_state)
+            self.GRU_h_state=Variable(self.GRU_h_state.data)
+            loss = criterion(prediction, target)
+            self.plot_loss_total += loss.data[0]
+            self.print_loss_total += loss.data[0]
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-                prediction_view=prediction[:,-1,:].data.numpy().flatten()
+            prediction_view=prediction[:,-1,:].data.numpy().flatten()
 
-                lines[1].set_ydata(prediction_view)
+            lines[1].set_ydata(prediction_view)
 
-                # target_view=input[:,-1,:].data.numpy()# continuously plot
-                # prediction_view=prediction[:,-1,:].data.numpy()
-                # plt.plot(time_period,target_view.flatten(),'r-')
-                # plt.plot(time_period,prediction_view.flatten(),'b-')
-                # plt.draw();plt.pause(0.05)
-
-                if iter % self.Print_interval == 0:
-                    print_loss_avg = self.print_loss_total / self.Print_interval
-                    self.print_loss_total = 0
-                    print('%s (%d %d%%) %.8f' % (timeSince(time_tr_start, iter / self.Num_iters),
-                                                iter, iter / self.Num_iters * 100, print_loss_avg))
-                if iter % self.Plot_interval == 0:
-                    plot_loss_avg = self.plot_loss_total / self.Plot_interval
-                    plot_losses.append(plot_loss_avg)
-                    self.plot_loss_total = 0
+            if iter % self.Print_interval == 0:
+                print_loss_avg = self.print_loss_total / self.Print_interval
+                self.print_loss_total = 0
+                print('%s (%d %d%%) %.8f' % (timeSince(time_tr_start, iter / self.Num_iters),
+                                            iter, iter / self.Num_iters * 100, print_loss_avg))
             
-            return lines
+            text_iter.set_text(text_template % str(iter))
+            # if iter % self.Plot_interval == 0:
+            #     plot_loss_avg = self.plot_loss_total / self.Plot_interval
+            #     plot_losses.append(plot_loss_avg)
+            #     self.plot_loss_total = 0
+            return tuple(lines)+(text_iter,)
+
         
         # call the animator.  blit=True means only re-draw the parts that have changed.
-        anim = animation.FuncAnimation(fig, update,  interval=10)
+        anim = animation.FuncAnimation(fig, update, frames=self.Num_iters ,interval=1,blit=True,repeat=False)
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
-        print('GRU Model finished fitting')
+        # plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
 
         plt.show()
+        print('GRU Model finished fitting')
 
         return self
