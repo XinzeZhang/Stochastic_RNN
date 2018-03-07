@@ -18,6 +18,8 @@ import matplotlib.pyplot as plt
 
 import time
 
+from matplotlib import animation
+
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, look_back=1):
     # dataset = np.insert(dataset, [0] * look_back, 0)
@@ -146,6 +148,45 @@ def plot_loss(points,Fig_name):
     plt.plot(points)
     plt.savefig('./Result/'+Fig_name+'.png')
     plt.close()
+
+# show gpu train
+def plot_train(Figure_size,target,Viewlist):
+    Num_iters=len(Viewlist)
+    target_size=target.size(0)# continuously plot
+    time_period=np.arange(target_size)# continuously plot
+    fig=plt.figure(figsize=(Figure_size[0],Figure_size[1]))
+    ax=plt.subplot(111)
+
+    lines=[]
+    target_view=target[:,-1].data.numpy().flatten()
+    line,=ax.plot(time_period,target_view,'r-',label='Target')
+    lines.append(line)
+    line,=ax.plot(time_period,np.linspace(0,0,num=target_size),'g-',label='Train Result')
+    lines.append(line)
+    ax.set_ylim(-1,1)
+
+    # No ticks
+    ax.set_xticks([])
+    ax.set_yticks([])
+    text_template='Iter = %s'
+    text_iter=ax.text(0.05, 0.9, '', transform=ax.transAxes)
+
+
+    def update(iter):
+        # update data
+        # for iter in range(1,self.Num_iters+1):
+
+        prediction_view=Viewlist[iter].numpy().flatten()
+
+        lines[1].set_ydata(prediction_view)
+        
+        text_iter.set_text(text_template % str(iter+1))
+
+        return tuple(lines)+(text_iter,)
+    
+    anim = animation.FuncAnimation(fig, update, frames=Num_iters ,interval=20,blit=True,repeat=False)
+    plt.legend(loc='upper right')
+    plt.show()
 
 if __name__ == '__main__':
     #------------------------------------------------------------------------

@@ -55,8 +55,8 @@ if __name__ == '__main__':
     # test_scaled :: shape:[train_num,seq_len] which meams [batch, input_size]
 
     # set random seed to 0
-    np.random.seed(0)
-    torch.manual_seed(0)
+    np.random.seed(4)
+    torch.manual_seed(4)
     # ---------------------------------------------------------------------------------------
     # load data and make training set
     train_input_scaled = train_scaled[:, :-1, np.newaxis]
@@ -77,12 +77,13 @@ if __name__ == '__main__':
 
     # ========================================================================================
     # hyper parameters
-    Num_layers = 2
-    Num_iters = 6000
-    Hidden_size = 500
+    Num_layers = 1
+    Num_iters = 2000
+    Hidden_size = 200
     Print_interval = 50
     Plot_interval = 1
-    Learning_rate = 0.5
+    Optim_method='_Adam' # '_SGD' or '_Adam'
+    Learning_rate = 0.001
     Cell="GRU"
 
     GRU_demo = GRUModel(input_dim=1,
@@ -91,14 +92,22 @@ if __name__ == '__main__':
                         num_layers=Num_layers,
                         cell=Cell,
                         num_iters=Num_iters,
+                        optim_method=Optim_method,
                         learning_rate=Learning_rate,
                         print_interval=Print_interval,
-                        plot_interval=Plot_interval)
+                        plot_interval=Plot_interval).cuda()
     # ========================================================================================
-    GRU_demo.fit_view(train_input, train_target)
+    # GRU_demo.fit(train_input, train_target)
+
+    Model_ViewList=GRU_demo.fit_view(train_input, train_target)
+    # GRU_demo=Model_ViewList[0]
+    Train_ViewList=Model_ViewList[1]
     #---------------------------------------------------------------------------------------
     # begin to forcast
+    print('\n------------------------------------------------')
     print('Forecasting Testing Data')
+    print('------------------------------------------------')
+    
 
     Y_train = GRU_demo.predict(train_input)
     Y_train = Y_train[:, -1]
@@ -131,3 +140,12 @@ if __name__ == '__main__':
                 Pred_value=Y_pred,
                 Loss_pred=MSE_pred,
                 Fig_name='Prediction' + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters))
+    
+    #---------------------------------------------------------------------------------------
+    # show the view of training
+
+    print('\n------------------------------------------------')
+    print('Showing the view of train')
+    print('------------------------------------------------')
+    figure_size=[25,5]
+    plot_train(figure_size,train_target,Train_ViewList)

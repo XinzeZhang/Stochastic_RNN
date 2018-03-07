@@ -65,7 +65,13 @@ class GRUModel(BaseModel):
         self.Learn_rate=learning_rate
 
     def forward(self, input, h_state): #input: shape[batch,time_step,input_dim]
+        
+        # h_state_0 = Variable(torch.zeros(self.Num_layers * 1, batchSize, self.Hidden_Size).double(),
+        #                requires_grad=False).cuda() # h_state (n_layers * num_direction, batch, Hidden_size)                      
         GRU_Output, h_state_n = self.Cell(input, h_state)  
+        # h_state = h_state_n.view(batchSize, self.Hidden_Size)
+        # fcOutputs = self.fc(h_state)
+        
         FC_Outputs=[] # save all predictions
 
         for time_step in range(GRU_Output.size(1)):
@@ -80,12 +86,10 @@ class GRUModel(BaseModel):
     
     def initHidden(self,input):
         batchSize=input.size(0)
-        result = Variable(torch.zeros(self.Num_layers * 1, batchSize, self.Hidden_Size)).cuda()
+        result = Variable(torch.zeros(self.Num_layers * 1, batchSize, self.Hidden_Size))
         return result
     
     def fit(self, input, target):
-        input=input.cuda()
-        target=target.cuda()
         GRU_h_state=self.initHidden(input)
         criterion = nn.MSELoss()
         if self.Optim_method=='_SGD':
@@ -109,7 +113,7 @@ class GRUModel(BaseModel):
         # begin to train
         for iter in range(1, self.Num_iters + 1): 
             prediction, GRU_h_state = self.forward(input,GRU_h_state)
-            GRU_h_state=Variable(GRU_h_state.data).cuda()
+            GRU_h_state=Variable(GRU_h_state.data)
             loss = criterion(prediction, target)
             plot_loss_total += loss.data[0]
             print_loss_total += loss.data[0]
@@ -146,15 +150,14 @@ class GRUModel(BaseModel):
         return y_pred
 
     def _predict(self, input):
-        input=input.cuda()
         predict_h_state=self.initHidden(input)
         y_pred,predict_h_state=self.forward(input,predict_h_state)
-        y_pred=y_pred.cpu().data.numpy()
+        y_pred=y_pred.data.numpy()
         return y_pred
     
     def fit_view(self, input, target):
-        input=input.cuda()
-        target=target.cuda()
+        # input=input.cuda()
+        # target=target.cuda()
         GRU_h_state=self.initHidden(input)
         criterion = nn.MSELoss()
         if self.Optim_method=='_SGD':
@@ -173,13 +176,14 @@ class GRUModel(BaseModel):
         # begin to train
         for iter in range(1, self.Num_iters + 1): 
             prediction, GRU_h_state = self.forward(input,GRU_h_state)
-            GRU_h_state=Variable(GRU_h_state.data).cuda()
+            
+            GRU_h_state=Variable(GRU_h_state.data)
             loss = criterion(prediction, target)
             plot_loss_total += loss.data[0]
             print_loss_total += loss.data[0]
             optimizer.zero_grad()
             loss.backward()
-            Predict_ViewList.append(prediction[:,-1,:].cpu().data)
+            Predict_ViewList.append(prediction[:,-1,:].data)
             optimizer.step()
 
             if iter % self.Print_interval == 0:
