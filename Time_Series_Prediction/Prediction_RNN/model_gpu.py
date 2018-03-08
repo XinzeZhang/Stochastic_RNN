@@ -64,7 +64,10 @@ class GRUModel(BaseModel):
         self.Optim_method=optim_method
         self.Learn_rate=learning_rate
 
-    def forward(self, input, h_state): #input: shape[batch,time_step,input_dim]
+    def forward(self, input, h_state): 
+        # input: shape[batch,time_step,input_dim]
+        # h_state: shape[layer_num*direction,batch,hidden_size]
+        # rnn_output: shape[batch,time_sequence_length,hidden_size]
         GRU_Output, h_state_n = self.Cell(input, h_state)  
         FC_Outputs=[] # save all predictions
 
@@ -108,6 +111,9 @@ class GRUModel(BaseModel):
 
         # begin to train
         for iter in range(1, self.Num_iters + 1): 
+            # input: shape[batch,time_step,input_dim]
+            # h_state: shape[layer_num*direction,batch,hidden_size]
+            # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, GRU_h_state = self.forward(input,GRU_h_state)
             GRU_h_state=Variable(GRU_h_state.data).cuda()
             loss = criterion(prediction, target)
@@ -171,7 +177,10 @@ class GRUModel(BaseModel):
 
         Predict_ViewList=[]
         # begin to train
-        for iter in range(1, self.Num_iters + 1): 
+        for iter in range(1, self.Num_iters + 1):
+            # input: shape[batch,time_step,input_dim]
+            # h_state: shape[layer_num*direction,batch,hidden_size]
+            # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, GRU_h_state = self.forward(input,GRU_h_state)
             GRU_h_state=Variable(GRU_h_state.data).cuda()
             loss = criterion(prediction, target)
