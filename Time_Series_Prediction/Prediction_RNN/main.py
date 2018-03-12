@@ -40,7 +40,7 @@ if __name__ == '__main__':
     dataset = difference(raw_values, 1)
 
     # creat dataset train, test
-    ts_look_back = 12
+    ts_look_back = 24
     dataset = create_dataset(dataset, look_back=ts_look_back)
 
     # split into train and test sets
@@ -55,8 +55,8 @@ if __name__ == '__main__':
     # test_scaled :: shape:[train_num,seq_len] which meams [batch, input_size]
 
     # set random seed to 0
-    np.random.seed(4)
-    torch.manual_seed(4)
+    np.random.seed(0)
+    torch.manual_seed(0)
     # ---------------------------------------------------------------------------------------
     # load data and make training set
     train_input_scaled = train_scaled[:, :-1, np.newaxis]
