@@ -61,6 +61,7 @@ if __name__ == '__main__':
     testplot.set_title('Prediction (MSE %0.3f)' % err)
     testplot.legend(loc='lower right')
     plt.tight_layout(0.5)
+    plt.savefig('Prediction.png')
 
     # Grid search
     pipeline = Pipeline([('esn', SimpleESN(n_readout=1000)),
@@ -97,6 +98,6 @@ if __name__ == '__main__':
     testplot.set_title('Prediction after GridSearch (MSE %0.3f)' % err)
     testplot.legend(loc='lower right')
     plt.tight_layout(0.5)
-    plt.show()
+    plt.savefig('Prediction after GridSearch.png')
     
     
