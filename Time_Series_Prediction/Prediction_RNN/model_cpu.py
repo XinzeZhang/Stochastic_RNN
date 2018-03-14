@@ -158,6 +158,7 @@ class GRUModel(BaseModel):
     def fit_view(self, input, target):
         # input=input.cuda()
         # target=target.cuda()
+        self.View_interval=view_interval
         GRU_h_state=self.initHidden(input)
         criterion = nn.MSELoss()
         if self.Optim_method=='_SGD':
@@ -174,18 +175,21 @@ class GRUModel(BaseModel):
 
         Predict_ViewList=[]
         # begin to train
-        for iter in range(1, self.Num_iters + 1): 
+        for iter in range(1, self.Num_iters + 1):
+            # input: shape[batch,time_step,input_dim]
+            # h_state: shape[layer_num*direction,batch,hidden_size]
+            # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, GRU_h_state = self.forward(input,GRU_h_state)
-            
             GRU_h_state=Variable(GRU_h_state.data)
             loss = criterion(prediction, target)
             plot_loss_total += loss.data[0]
             print_loss_total += loss.data[0]
             optimizer.zero_grad()
-            loss.backward()
-            Predict_ViewList.append(prediction[:,-1,:].data)
+            loss.backward() 
             optimizer.step()
 
+            if iter % self.View_interval == 0:
+                Predict_ViewList.append(prediction[:,-1,:].cpu().data)
             if iter % self.Print_interval == 0:
                 print_loss_avg = print_loss_total / self.Print_interval
                 print_loss_total = 0

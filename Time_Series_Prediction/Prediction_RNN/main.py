@@ -37,11 +37,17 @@ if __name__ == '__main__':
     set_length = len(ts_values_array)
 
     # transform data to be stationary
-    dataset = difference(raw_values, 1)
+    dataset_difference = difference(raw_values, 1)
 
     # creat dataset train, test
     ts_look_back = 24
-    dataset = create_dataset(dataset, look_back=ts_look_back)
+    using_difference = False
+    if using_difference == True:
+            # using dataset_diference for training
+        dataset = create_dataset(dataset_difference, look_back=ts_look_back)
+    else:
+        # using dataset for training
+        dataset = create_dataset(ts_values_array, look_back=ts_look_back)
 
     # split into train and test sets
     train_size = int(dataset.shape[0] * 0.8)
@@ -78,13 +84,14 @@ if __name__ == '__main__':
     # ========================================================================================
     # hyper parameters
     Num_layers = 1
-    Num_iters = 2000
-    Hidden_size = 200
+    Num_iters = 5000
+    Hidden_size = 500
     Print_interval = 50
     Plot_interval = 1
-    Optim_method='_Adam' # '_SGD' or '_Adam'
+    View_interval = Num_iters // 1000
+    Optim_method = '_SGD'  # '_SGD' or '_Adam'
     Learning_rate = 0.001
-    Cell="GRU"
+    Cell = "GRU"
 
     GRU_demo = GRUModel(input_dim=1,
                         hidden_size=Hidden_size,
@@ -99,21 +106,24 @@ if __name__ == '__main__':
     # ========================================================================================
     # GRU_demo.fit(train_input, train_target)
 
-    Model_ViewList=GRU_demo.fit_view(train_input, train_target)
+    Model_ViewList = GRU_demo.fit_view(train_input, train_target,View_interval)
+    # save the model
+    torch.save(GRU_demo,'./Model/Model' + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters)+Optim_method+'.pkl')
     # GRU_demo=Model_ViewList[0]
-    Train_ViewList=Model_ViewList[1]
+    Train_ViewList = Model_ViewList[1]
     #---------------------------------------------------------------------------------------
     # begin to forcast
     print('\n------------------------------------------------')
     print('Forecasting Testing Data')
     print('------------------------------------------------')
-    
 
     Y_train = GRU_demo.predict(train_input)
     Y_train = Y_train[:, -1]
     # inverse the train pred
     Y_train = invert_scale(scaler, train_input_scaled, Y_train)
-    Y_train = inverse_train_difference(raw_values, Y_train, ts_look_back)
+    if using_difference == True:
+        # if using dataset_difference
+        Y_train = inverse_train_difference(raw_values, Y_train, ts_look_back)
 
     # get test_result
     Y_pred = GRU_demo.predict(test_input)
@@ -128,8 +138,10 @@ if __name__ == '__main__':
     MSE_pred = MSE_pred.data.numpy()
     # inverse the test pred
     Y_pred = invert_scale(scaler, test_input_scaled, Y_pred)
-    Y_pred = inverse_test_difference(
-        raw_values, Y_pred, train_size, ts_look_back)
+    if using_difference == True:
+        # if using dataset_difference
+        Y_pred = inverse_test_difference(
+            raw_values, Y_pred, train_size, ts_look_back)
 
     # # print forecast
     # for i in range(len(test)):
@@ -140,12 +152,12 @@ if __name__ == '__main__':
                 Pred_value=Y_pred,
                 Loss_pred=MSE_pred,
                 Fig_name='Prediction' + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters))
-    
+
     #---------------------------------------------------------------------------------------
     # show the view of training
 
     print('\n------------------------------------------------')
     print('Showing the view of train')
     print('------------------------------------------------')
-    figure_size=[25,5]
-    plot_train(figure_size,train_target,Train_ViewList)
+    figure_size = [25, 5]
+    plot_train(figure_size, train_target, Train_ViewList)

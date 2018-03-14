@@ -108,7 +108,7 @@ def plot_result(TS_values,Train_value,Pred_value,Loss_pred,Fig_name='Prediction'
     train_scope=np.arange(look_back+1,train_size+look_back+1)
     test_scope=np.arange(train_size+look_back+1,ts_size)
 
-    plt.figure(figsize=(30,5))
+    plt.figure(figsize=(35,5))
     plt.title('Predict future values for time sequences\n(Dashlines are predicted values)', fontsize=12)
     plt.title('MSE of Prediction:'+str(Loss_pred),loc='right',fontsize=12)
     plt.xlabel('x', fontsize=10)
@@ -117,8 +117,8 @@ def plot_result(TS_values,Train_value,Pred_value,Loss_pred,Fig_name='Prediction'
     plt.yticks(fontsize=10) 
     
     plt.plot(time_period,TS_values,'r-',label='Original')
-    plt.plot(train_scope,Train_value,'g--',label='train')
-    plt.plot(test_scope,Pred_value,'b--',label='prediction')
+    plt.plot(train_scope,Train_value,'g-',label='train')
+    plt.plot(test_scope,Pred_value,'b-',label='prediction')
 
     plt.legend(loc='upper right')
     plt.savefig('./Result/'+Fig_name+'.png')

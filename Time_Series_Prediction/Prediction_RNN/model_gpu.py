@@ -56,7 +56,7 @@ class BaseModel(nn.Module):
 # GRU模型
 class GRUModel(BaseModel):
 
-    def __init__(self, input_dim, hidden_size, output_dim, num_layers, cell,num_iters,optim_method,learning_rate=0.1,print_interval=50,plot_interval=1):
+    def __init__(self, input_dim, hidden_size, output_dim, num_layers, cell,num_iters,optim_method,learning_rate=0.1,print_interval=50,plot_interval=1,view_interval=1):
         super(GRUModel, self).__init__(input_dim, hidden_size, output_dim, num_layers, cell)
         self.Print_interval=print_interval
         self.Plot_interval=plot_interval
@@ -158,7 +158,8 @@ class GRUModel(BaseModel):
         y_pred=y_pred.cpu().data.numpy()
         return y_pred
     
-    def fit_view(self, input, target):
+    def fit_view(self, input, target,view_interval):
+        self.View_interval=view_interval
         input=input.cuda()
         target=target.cuda()
         GRU_h_state=self.initHidden(input)
@@ -187,10 +188,11 @@ class GRUModel(BaseModel):
             plot_loss_total += loss.data[0]
             print_loss_total += loss.data[0]
             optimizer.zero_grad()
-            loss.backward()
-            Predict_ViewList.append(prediction[:,-1,:].cpu().data)
+            loss.backward() 
             optimizer.step()
 
+            if iter % self.View_interval == 0:
+                Predict_ViewList.append(prediction[:,-1,:].cpu().data)
             if iter % self.Print_interval == 0:
                 print_loss_avg = print_loss_total / self.Print_interval
                 print_loss_total = 0
