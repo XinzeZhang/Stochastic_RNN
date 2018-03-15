@@ -40,8 +40,8 @@ if __name__ == '__main__':
     dataset_difference = difference(raw_values, 1)
 
     # creat dataset train, test
-    ts_look_back = 24
-    using_difference = False
+    ts_look_back = 48
+    using_difference = True
     if using_difference == True:
             # using dataset_diference for training
         dataset = create_dataset(dataset_difference, look_back=ts_look_back)
@@ -84,10 +84,10 @@ if __name__ == '__main__':
     # ========================================================================================
     # hyper parameters
     Num_layers = 1
-    Num_iters = 5000
+    Num_iters = 7000
     Hidden_size = 500
-    Print_interval = 50
-    Plot_interval = 1
+    Print_interval = 100
+    Plot_interval = 100
     View_interval = Num_iters // 1000
     Optim_method = '_SGD'  # '_SGD' or '_Adam'
     Learning_rate = 0.001
