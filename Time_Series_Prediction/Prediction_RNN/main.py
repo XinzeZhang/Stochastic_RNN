@@ -40,8 +40,11 @@ if __name__ == '__main__':
     dataset_difference = difference(raw_values, 1)
 
     # creat dataset train, test
-    ts_look_back = 48
-    using_difference = True
+    ts_look_back = 1
+    using_difference = False
+    Diff=''
+    if using_difference==True:
+        Diff='_Diff'
     if using_difference == True:
             # using dataset_diference for training
         dataset = create_dataset(dataset_difference, look_back=ts_look_back)
@@ -84,16 +87,16 @@ if __name__ == '__main__':
     # ========================================================================================
     # hyper parameters
     Num_layers = 1
-    Num_iters = 7000
+    Num_iters = 6000
     Hidden_size = 500
     Print_interval = 100
     Plot_interval = 100
     View_interval = Num_iters // 1000
     Optim_method = '_SGD'  # '_SGD' or '_Adam'
     Learning_rate = 0.001
-    Cell = "GRU"
+    Cell = "RNN"
 
-    GRU_demo = GRUModel(input_dim=1,
+    RNN_Demo = RNNModel(input_dim=1,
                         hidden_size=Hidden_size,
                         output_dim=1,
                         num_layers=Num_layers,
@@ -104,12 +107,13 @@ if __name__ == '__main__':
                         print_interval=Print_interval,
                         plot_interval=Plot_interval).cuda()
     # ========================================================================================
-    # GRU_demo.fit(train_input, train_target)
+    # RNN_Demo.fit(train_input, train_target)
 
-    Model_ViewList = GRU_demo.fit_view(train_input, train_target,View_interval)
+    Model_ViewList = RNN_Demo.fit_view(train_input, train_target,View_interval)
     # save the model
-    torch.save(GRU_demo,'./Model/Model' + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters)+Optim_method+'.pkl')
-    # GRU_demo=Model_ViewList[0]
+    model_save_road='./Model/Model' + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters)+Optim_method+Diff+'.pkl'
+    torch.save(RNN_Demo,model_save_road)
+    # RNN_Demo=Model_ViewList[0]
     Train_ViewList = Model_ViewList[1]
     #---------------------------------------------------------------------------------------
     # begin to forcast
@@ -117,8 +121,9 @@ if __name__ == '__main__':
     print('Forecasting Testing Data')
     print('------------------------------------------------')
 
-    Y_train = GRU_demo.predict(train_input)
-    Y_train = Y_train[:, -1]
+    # Y_train = RNN_Demo.predict(train_input)
+    # Y_train = Y_train[:, -1]
+    Y_train=Train_ViewList[-1].numpy().flatten()
     # inverse the train pred
     Y_train = invert_scale(scaler, train_input_scaled, Y_train)
     if using_difference == True:
@@ -126,7 +131,7 @@ if __name__ == '__main__':
         Y_train = inverse_train_difference(raw_values, Y_train, ts_look_back)
 
     # get test_result
-    Y_pred = GRU_demo.predict(test_input)
+    Y_pred = RNN_Demo.predict(test_input)
     Y_pred = Y_pred[:, -1]
     Y_target = test_target_scaled[:, -1]
 
@@ -147,11 +152,12 @@ if __name__ == '__main__':
     # for i in range(len(test)):
     #     print('Predicted=%f, Expected=%f' % ( y_pred[i], raw_values[-len(test)+i]))
 
+    plot_fig_name=Cell + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters)+Diff
     plot_result(TS_values=ts_values_array,
                 Train_value=Y_train,
                 Pred_value=Y_pred,
                 Loss_pred=MSE_pred,
-                Fig_name='Prediction' + '_L' + str(Num_layers) + '_H' + str(Hidden_size) + '_I' + str(Num_iters))
+                Fig_name=plot_fig_name)
 
     #---------------------------------------------------------------------------------------
     # show the view of training
