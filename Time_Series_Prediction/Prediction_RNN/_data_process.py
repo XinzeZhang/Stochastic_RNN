@@ -116,9 +116,9 @@ def plot_result(TS_values,Train_value,Pred_value,Loss_pred,Fig_name='Prediction'
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10) 
     
-    plt.plot(time_period,TS_values,'r-',label='Original')
-    plt.plot(train_scope,Train_value,'g-',label='train')
-    plt.plot(test_scope,Pred_value,'b-',label='prediction')
+    plt.plot(time_period,TS_values,'r-',label='Original',linewidth=1)
+    plt.plot(train_scope,Train_value,'g-',label='train',linewidth=1)
+    plt.plot(test_scope,Pred_value,'b-',label='prediction',linewidth=1)
 
     plt.legend(loc='upper right')
     plt.savefig('./Result/'+Fig_name+'.png')
@@ -150,7 +150,7 @@ def plot_loss(points,Fig_name):
     plt.close()
 
 # show gpu train
-def plot_train(Figure_size,target,Viewlist):
+def plot_train(Figure_size,target,Viewlist,View_interval):
     Num_iters=len(Viewlist)
     target_size=target.size(0)# continuously plot
     time_period=np.arange(target_size)# continuously plot
@@ -159,9 +159,9 @@ def plot_train(Figure_size,target,Viewlist):
 
     lines=[]
     target_view=target[:,-1].data.numpy().flatten()
-    line,=ax.plot(time_period,target_view,'r-',label='Target')
+    line,=ax.plot(time_period,target_view,'r-',label='Target',linewidth=1)
     lines.append(line)
-    line,=ax.plot(time_period,np.linspace(0,0,num=target_size),'g-',label='Train Result')
+    line,=ax.plot(time_period,np.linspace(0,0,num=target_size),'g-',label='Train Result',linewidth=1)
     lines.append(line)
     ax.set_ylim(-1,1)
 
@@ -180,7 +180,7 @@ def plot_train(Figure_size,target,Viewlist):
 
         lines[1].set_ydata(prediction_view)
         
-        text_iter.set_text(text_template % str(iter+1))
+        text_iter.set_text(text_template % str((iter+1)*View_interval))
 
         return tuple(lines)+(text_iter,)
     

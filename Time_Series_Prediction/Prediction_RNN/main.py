@@ -40,7 +40,7 @@ if __name__ == '__main__':
     dataset_difference = difference(raw_values, 1)
 
     # creat dataset train, test
-    ts_look_back = 1
+    ts_look_back = 12
     using_difference = False
     Diff=''
     if using_difference==True:
@@ -166,4 +166,4 @@ if __name__ == '__main__':
     print('Showing the view of train')
     print('------------------------------------------------')
     figure_size = [25, 5]
-    plot_train(figure_size, train_target, Train_ViewList)
+    plot_train(figure_size, train_target, Train_ViewList,View_interval)

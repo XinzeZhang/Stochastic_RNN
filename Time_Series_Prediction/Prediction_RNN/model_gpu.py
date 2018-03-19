@@ -58,6 +58,7 @@ class GRUModel(BaseModel):
 
     def __init__(self, input_dim, hidden_size, output_dim, num_layers, cell,num_iters,optim_method,learning_rate=0.1,print_interval=50,plot_interval=1,view_interval=1):
         super(GRUModel, self).__init__(input_dim, hidden_size, output_dim, num_layers, cell)
+        self.cell_name=cell
         self.Print_interval=print_interval
         self.Plot_interval=plot_interval
         self.Num_iters=num_iters
@@ -204,7 +205,7 @@ class GRUModel(BaseModel):
                 plot_loss_total = 0
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
+        plot_loss(plot_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
         print('\n------------------------------------------------')
         print('GRU Model finished fitting')
         print('------------------------------------------------')
@@ -216,6 +217,7 @@ class RNNModel(BaseModel):
 
     def __init__(self, input_dim, hidden_size, output_dim, num_layers, cell,num_iters,optim_method,learning_rate=0.1,print_interval=50,plot_interval=1,view_interval=1):
         super(RNNModel, self).__init__(input_dim, hidden_size, output_dim, num_layers, cell)
+        self.cell_name=cell
         self.Print_interval=print_interval
         self.Plot_interval=plot_interval
         self.Num_iters=num_iters
@@ -298,7 +300,7 @@ class RNNModel(BaseModel):
                 plot_loss_total = 0
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
+        plot_loss(plot_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
         print('\n------------------------------------------------')
         print('GRU Model finished fitting')
         print('------------------------------------------------')
