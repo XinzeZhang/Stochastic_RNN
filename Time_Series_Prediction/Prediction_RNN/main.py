@@ -94,7 +94,7 @@ if __name__ == '__main__':
     View_interval = Num_iters // 1000
     Optim_method = '_SGD'  # '_SGD' or '_Adam'
     Learning_rate = 0.001
-    Cell = "RNN"
+    Cell = "GRU"
 
     RNN_Demo = RNNModel(input_dim=1,
                         hidden_size=Hidden_size,
