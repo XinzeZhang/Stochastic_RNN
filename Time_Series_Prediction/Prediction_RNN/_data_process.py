@@ -184,10 +184,10 @@ def plot_train(Figure_size, target, Viewlist, View_interval):
     lines = []
     target_view = target[:, -1].data.numpy().flatten()
     line, = ax.plot(time_period, target_view, 'r-',
-                    label='Target', linewidth=1)
+                    label='Target', linewidth=2)
     lines.append(line)
     line, = ax.plot(time_period, np.linspace(
-        0, 0, num=target_size), 'g-', label='Train Result', linewidth=1)
+        0, 0, num=target_size), 'g-', label='Train Result', linewidth=2)
     lines.append(line)
     ax.set_ylim(-1, 1)
 
