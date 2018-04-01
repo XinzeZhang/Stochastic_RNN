@@ -9,8 +9,8 @@ np.random.seed(0)
 Amplifier_Times = 20
 left_bound=0
 right_bound=1
-L = 1000
-N = 1
+L = 600
+N = 100
 
 x = np.empty((N, L), 'float64')
 length=np.array(range(L))
@@ -49,8 +49,10 @@ print(scaler.data_max_)
 print(scaler.transform(data1))
 
 data2=scaler.transform(data1)
+data3=data2.T.astype('float64')
+torch.save(data3, open('traindata.pt', 'wb'))
 
 plt.figure()
-plt.plot(x_input,data2.T,'bo')
+plt.plot(x_input[0,:],data3[0,:],'b-')
+plt.savefig('traindata.png')
 plt.show()
-
