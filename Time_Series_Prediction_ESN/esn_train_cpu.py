@@ -18,6 +18,11 @@ if __name__ == '__main__':
     train_input = data[:-1, :-1]
     train_target = data[:-1, 1:]
 
+    test_input=data[-1,:-1]
+    test_input=test_input.reshape(1,len(test_input))
+    test_target=data[-1,1:]
+    test_target=test_target.reshape(1,len(test_target))
+
     # Simple training
     model_esn = SimpleESN(n_readout=1000, n_components=1000,
                           damping=0.3, weight_scaling=1.25)
@@ -25,26 +30,50 @@ if __name__ == '__main__':
     regr = Ridge(alpha=0.01)
     regr.fit(echo_train_state, train_target)
 
+    # show the train result
     echo_train_target, echo_train_pred= train_target, regr.predict(echo_train_state)
 
-    err = mean_squared_error(echo_train_target, echo_train_pred)
+    err_train = mean_squared_error(echo_train_target, echo_train_pred)
 
     data_figures = plt.figure(figsize=(12, 4))
     trainplot = data_figures.add_subplot(1, 3, 1)
-    trainplot.plot(train_input[1,:], 'b')
+    trainplot.plot(train_input[0,:], 'b')
     trainplot.set_title('training signal')
 
     echoplot = data_figures.add_subplot(1, 3, 2)
-    echoplot.plot(echo_train_state[:, :20])
-    echoplot.set_title('Some reservoir activation')
+    # echoplot.plot(echo_train_state[0, :20])
+    echoplot.plot(echo_train_state[0, :])
+    echoplot.set_title('ALL reservoir activation')
 
     testplot = data_figures.add_subplot(1, 3, 3)
-    testplot.plot(train_target[1,:], 'r', label='test signal')
-    testplot.plot(echo_train_pred[1,:], 'g', label='prediction')
-    testplot.set_title('Prediction (MSE %0.8f)' % err)
+    testplot.plot(train_target[0,:], 'r', label='train signal')
+    testplot.plot(echo_train_pred[0,:], 'g', label='prediction')
+    testplot.set_title('Prediction (MSE %0.8f)' % err_train)
 
     testplot.legend(loc='upper right')
     plt.tight_layout(0.5)
-    plt.savefig('Data_Prediction.png')
+    plt.savefig('Data_Train_Prediction.png')
+
+    # show the test result
+    echo_test_state=model_esn.transform(test_input)
+    echo_test_target, echo_test_pred = test_target, regr.predict(echo_test_state)
     
-    
+    err_test = mean_squared_error(echo_test_target, echo_test_pred)
+
+    data_figures = plt.figure(figsize=(12, 4))
+    trainplot = data_figures.add_subplot(1, 3, 1)
+    trainplot.plot(test_input[0,:], 'b')
+    trainplot.set_title('training signal')
+
+    echoplot = data_figures.add_subplot(1, 3, 2)
+    echoplot.plot(echo_test_state[0, :20])
+    echoplot.set_title('Some reservoir activation')
+
+    testplot = data_figures.add_subplot(1, 3, 3)
+    testplot.plot(test_target[0,:], 'r', label='test signal')
+    testplot.plot(echo_test_pred[0,:], 'g', label='prediction')
+    testplot.set_title('Prediction (MSE %0.8f)' % err_test)
+
+    testplot.legend(loc='upper right')
+    plt.tight_layout(0.5)
+    plt.savefig('Data_Test_Prediction.png')
