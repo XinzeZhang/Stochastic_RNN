@@ -4,11 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${file}"
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
+            ]
         },
         {
             "name": "Python: Attach",
@@ -24,36 +33,58 @@
             "name": "Python: Terminal (integrated)",
             "type": "python",
             "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "cwd": "",
+            "console": "integratedTerminal",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [],
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "name": "Python: Terminal (external)",
             "type": "python",
             "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${file}",
-            "console": "externalTerminal"
+            "cwd": "",
+            "console": "externalTerminal",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [],
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceFolder}/manage.py",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "runserver",
                 "--noreload",
                 "--nothreading"
             ],
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
             "debugOptions": [
                 "RedirectOutput",
-                "Django"
+                "DjangoDebugging"
             ]
         },
         {
             "name": "Python: Flask (0.11.x or later)",
             "type": "python",
             "request": "launch",
+            "stopOnEntry": false,
+            "pythonPath": "${config:python.pythonPath}",
             "module": "flask",
+            "cwd": "${workspaceFolder}",
             "env": {
                 "FLASK_APP": "${workspaceFolder}/app.py"
             },
@@ -61,18 +92,72 @@
                 "run",
                 "--no-debugger",
                 "--no-reload"
+            ],
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
+            ]
+        },
+        {
+            "name": "Python: Flask (0.10.x or earlier)",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": false,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${workspaceFolder}/run.py",
+            "cwd": "${workspaceFolder}",
+            "args": [],
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
+            ]
+        },
+        {
+            "name": "Python: PySpark",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "osx": {
+                "pythonPath": "${env:SPARK_HOME}/bin/spark-submit"
+            },
+            "windows": {
+                "pythonPath": "${env:SPARK_HOME}/bin/spark-submit.cmd"
+            },
+            "linux": {
+                "pythonPath": "${env:SPARK_HOME}/bin/spark-submit"
+            },
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
             ]
         },
         {
             "name": "Python: Module",
             "type": "python",
             "request": "launch",
-            "module": "module.name"
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "module": "module.name",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
+            "debugOptions": [
+                "RedirectOutput"
+            ]
         },
         {
             "name": "Python: Pyramid",
             "type": "python",
             "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
             "args": [
                 "${workspaceFolder}/development.ini"
             ],
@@ -85,29 +170,17 @@
             "name": "Python: Watson",
             "type": "python",
             "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceFolder}/console.py",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "dev",
                 "runserver",
                 "--noreload=True"
-            ]
-        },
-        {
-            "name": "Python: All debug Options",
-            "type": "python",
-            "request": "launch",
-            "pythonPath": "${config:python.pythonPath}",
-            "program": "${file}",
-            "module": "module.name",
-            "env": {
-                "VAR1": "1",
-                "VAR2": "2"
-            },
-            "envFile": "${workspaceFolder}/.env",
-            "args": [
-                "arg1",
-                "arg2"
             ],
+            "env": {},
+            "envFile": "${workspaceFolder}/.env",
             "debugOptions": [
                 "RedirectOutput"
             ]

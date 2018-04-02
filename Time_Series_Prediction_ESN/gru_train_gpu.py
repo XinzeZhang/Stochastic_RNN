@@ -98,5 +98,5 @@ if __name__ == '__main__':
             draw(test_input.cpu().data.numpy()[0], 'r')
             draw(y[0], 'g')
             # draw(y[2], 'b')
-            plt.savefig('predict%d.png'%i)
+            plt.savefig('./GRU_Results/predict%d.png'%i)
             plt.close()
