@@ -4,7 +4,11 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.optim as optim
+
 import numpy as np
+from numpy import atleast_2d
+from sklearn.metrics import mean_squared_error
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -52,10 +56,12 @@ if __name__ == '__main__':
         torch.manual_seed(0)
         # load data and make training set
         data = torch.load('traindata.pt')
-        input = Variable(torch.from_numpy(data[3:, :-1]), requires_grad=False).cuda()
-        target = Variable(torch.from_numpy(data[3:, 1:]), requires_grad=False).cuda()
-        test_input = Variable(torch.from_numpy(data[:3, :-1]), requires_grad=False).cuda()
-        test_target = Variable(torch.from_numpy(data[:3, 1:]), requires_grad=False).cuda()
+
+        # data shape should be (batch, lens_ts)
+        input = Variable(torch.from_numpy(atleast_2d(data[0, :-1])), requires_grad=False).cuda()
+        target = Variable(torch.from_numpy(atleast_2d(data[0, 1:])), requires_grad=False).cuda()
+        test_input = Variable(torch.from_numpy(atleast_2d(data[-1, :-1])), requires_grad=False).cuda()
+        test_target = Variable(torch.from_numpy(atleast_2d(data[-1, 1:])), requires_grad=False).cuda()
         # build the model
         seq = Sequence().cuda()
         seq.double()
@@ -84,19 +90,22 @@ if __name__ == '__main__':
             pred = seq(test_input, future = future)
             # loss = criterion(pred[:, :-future], test_target)
             # print('test loss:', loss.data[0])
-            y = pred.cpu().data.numpy()
+            y_pred = pred.cpu().data.numpy()
+            err = mean_squared_error(test_target.cpu().data.numpy(), y_pred)
+
             # draw the result
             plt.figure(figsize=(30,10))
-            plt.title('Predict future values for time sequences\n(Green-line are predicted values)', fontsize=30)
+            plt.title('Predict future values for time sequences\n(MSE %0.8f)' % err, fontsize=30)
             plt.xlabel('x', fontsize=20)
             plt.ylabel('y', fontsize=20)
             plt.xticks(fontsize=20)
             plt.yticks(fontsize=20)
-            def draw(yi, color):
-                plt.plot(np.arange(input.size(1)), yi[:input.size(1)], color, linewidth = 2.0)
+            def draw(yi, color, lable_name):
+                plt.plot(np.arange(input.size(1)), yi[:input.size(1)], color,label=lable_name, linewidth = 2.0)
                 # plt.plot(np.arange(input.size(1), input.size(1) + future), yi[input.size(1):], color + ':', linewidth = 2.0)
-            draw(test_input.cpu().data.numpy()[0], 'r')
-            draw(y[0], 'g')
+            draw(test_target.cpu().data.numpy()[0], 'r','Test Target')
+            draw(y_pred[0], 'g','Test Prediction')
+            plt.legend(loc='upper right')
             # draw(y[2], 'b')
             plt.savefig('./GRU_Results/predict%d.png'%i)
             plt.close()

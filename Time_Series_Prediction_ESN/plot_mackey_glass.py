@@ -32,7 +32,7 @@ if __name__ == '__main__':
     X = atleast_2d(X).T
     train_length = 2000
     test_length = 2000
-    
+    # data shape should be (lens_ts, n_features)
     X_train = X[:train_length]
     y_train = X[1:train_length+1]
     X_test = X[train_length:train_length+test_length]
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     testplot.set_title('Prediction (MSE %0.3f)' % err)
     testplot.legend(loc='lower right')
     plt.tight_layout(0.5)
-    plt.savefig('Prediction.png')
+    plt.savefig('MackeyGlass_Pred.png')
 
     # Grid search
     pipeline = Pipeline([('esn', SimpleESN(n_readout=1000)),
@@ -98,6 +98,6 @@ if __name__ == '__main__':
     testplot.set_title('Prediction after GridSearch (MSE %0.3f)' % err)
     testplot.legend(loc='lower right')
     plt.tight_layout(0.5)
-    plt.savefig('Prediction after GridSearch.png')
+    plt.savefig('MackeyGlass_Pred after GridSearch.png')
     
     

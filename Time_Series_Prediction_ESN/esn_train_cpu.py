@@ -14,14 +14,16 @@ import torch
 if __name__ == '__main__':
     # load data and make training set
     data = torch.load('traindata.pt')
-
-    train_input = data[:-1, :-1]
-    train_target = data[:-1, 1:]
+    # data shape should be (lens_ts, n_features)
+    train_input = data[0, :-1]
+    train_input=atleast_2d(train_input).T
+    train_target = data[0, 1:]
+    train_target=atleast_2d(train_target).T
 
     test_input=data[-1,:-1]
-    test_input=test_input.reshape(1,len(test_input))
+    test_input=atleast_2d(test_input).T
     test_target=data[-1,1:]
-    test_target=test_target.reshape(1,len(test_target))
+    test_target=atleast_2d(test_target).T
 
     # Simple training
     model_esn = SimpleESN(n_readout=1000, n_components=1000,
@@ -37,17 +39,17 @@ if __name__ == '__main__':
 
     data_figures = plt.figure(figsize=(12, 4))
     trainplot = data_figures.add_subplot(1, 3, 1)
-    trainplot.plot(train_input[0,:], 'b')
+    trainplot.plot(train_input[:], 'b')
     trainplot.set_title('training signal')
 
     echoplot = data_figures.add_subplot(1, 3, 2)
     # echoplot.plot(echo_train_state[0, :20])
-    echoplot.plot(echo_train_state[0, :])
+    echoplot.plot(echo_train_state[:, :20])
     echoplot.set_title('ALL reservoir activation')
 
     testplot = data_figures.add_subplot(1, 3, 3)
-    testplot.plot(train_target[0,:], 'r', label='train signal')
-    testplot.plot(echo_train_pred[0,:], 'g', label='prediction')
+    testplot.plot(train_target[:], 'r', label='train signal')
+    testplot.plot(echo_train_pred[:], 'g', label='prediction')
     testplot.set_title('Prediction (MSE %0.8f)' % err_train)
 
     testplot.legend(loc='upper right')
@@ -62,16 +64,16 @@ if __name__ == '__main__':
 
     data_figures = plt.figure(figsize=(12, 4))
     trainplot = data_figures.add_subplot(1, 3, 1)
-    trainplot.plot(test_input[0,:], 'b')
+    trainplot.plot(test_input[:], 'b')
     trainplot.set_title('training signal')
 
     echoplot = data_figures.add_subplot(1, 3, 2)
-    echoplot.plot(echo_test_state[0, :20])
+    echoplot.plot(echo_test_state[:, :20])
     echoplot.set_title('Some reservoir activation')
 
     testplot = data_figures.add_subplot(1, 3, 3)
-    testplot.plot(test_target[0,:], 'r', label='test signal')
-    testplot.plot(echo_test_pred[0,:], 'g', label='prediction')
+    testplot.plot(test_target[:], 'r', label='test signal')
+    testplot.plot(echo_test_pred[:], 'g', label='prediction')
     testplot.set_title('Prediction (MSE %0.8f)' % err_test)
 
     testplot.legend(loc='upper right')
