@@ -91,22 +91,22 @@ if __name__ == '__main__':
     # test_size = dataset.shape[0] - train_size
     test_scope= np.arange(train_size,set_length)
     #-------------------------------------------------------------------
-    # divide the tf_values to train set and test set
-    tf_train=ts_values_array[:train_size].copy()
-    tf_expect=ts_values_array[train_size:].copy()
+    # divide the ts_values to train set and test set
+    ts_train=ts_values_array[:train_size].copy()
+    ts_target=ts_values_array[train_size:].copy()
     #--------------------------------------------------------------------
-    #divide the tf_values_diff to train set and test set
+    #divide the ts_values_diff to train set and test set
     train, test = dataset[0:train_size], dataset[train_size:]
-    tf_train_diff=train[:,:1]
-    tf_test_diff=test[:,:1]
-    tf_test_diff=np.insert(tf_test_diff,[-1],dataset[-1,-1])
+    ts_train_diff=train[:,:1]
+    ts_test_diff=test[:,:1]
+    ts_test_diff=np.insert(ts_test_diff,[-1],dataset[-1,-1])
     #--------------------------------------------------------------------
     # transform the scale of the data
     scaler, train_scaled, test_scaled = scale(train, test)
     # divided the train_set and test_set
-    tf_trian_scaled=train_scaled[:,:1]
-    tf_test_scaled=test_scaled[:,:1]
-    tf_test_scaled=np.insert(tf_test_scaled,[-1],test_scaled[-1,-1])
+    ts_trian_scaled=train_scaled[:,:1]
+    ts_test_scaled=test_scaled[:,:1]
+    ts_test_scaled=np.insert(ts_test_scaled,[-1],test_scaled[-1,-1])
 
     #=====================================================================
     #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -115,18 +115,18 @@ if __name__ == '__main__':
     # draw the train set and test set
     ax1=plt.subplot(311)
     ax1.set_xticks(np.arange(0,set_length,10))
-    ax1.plot(train_scope, tf_train,'r',label='tf_train',linewidth = 1.0)
-    ax1.plot(test_scope, tf_expect,'r:',label='tf_expect',linewidth = 1.0)
+    ax1.plot(train_scope, ts_train,'g',label='ts_train',linewidth = 1.0)
+    ax1.plot(test_scope, ts_target,'r',label='ts_target',linewidth = 1.0)
     ax1.minorticks_on()
-    ax1.grid(which='both')
+    # ax1.grid(which='both')
     ax1.legend(loc='upper right')
     ax1.set_title('Values for Time Sequences')
     plt.xlabel('Time Sequence' )
     plt.ylabel('Value')
     #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ax2=plt.subplot(312,sharex=ax1)
-    ax2.plot(train_scope, tf_train_diff,'g',label='tf_train_diff',linewidth = 1.0)
-    ax2.plot(test_scope, tf_test_diff,'g:',label='tf_expect_diff',linewidth = 1.0)
+    ax2.plot(train_scope, ts_train_diff,'g',label='ts_train_diff',linewidth = 1.0)
+    ax2.plot(test_scope, ts_test_diff,'g:',label='ts_target_diff',linewidth = 1.0)
     ax2.minorticks_on()
     ax2.grid(which='both')
     ax2.legend(loc='upper right')
@@ -135,8 +135,8 @@ if __name__ == '__main__':
     plt.ylabel('Difference')
     #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     ax3=plt.subplot(313,sharex=ax1)
-    ax3.plot(train_scope, tf_trian_scaled,'b',label='tf_train_diff_scaled',linewidth = 1.0)
-    ax3.plot(test_scope, tf_test_scaled,'b:',label='tf_expect_diff_scaled',linewidth = 1.0)
+    ax3.plot(train_scope, ts_trian_scaled,'b',label='ts_train_diff_scaled',linewidth = 1.0)
+    ax3.plot(test_scope, ts_test_scaled,'b:',label='ts_target_diff_scaled',linewidth = 1.0)
     ax3.minorticks_on()
     ax3.grid(which='both')
     ax3.legend(loc='upper right')
@@ -145,4 +145,5 @@ if __name__ == '__main__':
     plt.ylabel('Scaled Difference')
 
     plt.subplots_adjust(hspace=0.75)
-    plt.savefig('data_visualization.png')
+    plt.show()
+    # plt.savefig('data_visualization.png')
