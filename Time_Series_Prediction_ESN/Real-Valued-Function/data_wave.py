@@ -50,9 +50,9 @@ print(scaler.transform(data1))
 
 data2=scaler.transform(data1)
 data3=data2.T.astype('float64')
-torch.save(data3, open('traindata.pt', 'wb'))
+torch.save(data3, open('real-valued-function.pt', 'wb'))
 
 plt.figure()
 plt.plot(x_input[0,:],data3[0,:],'b-')
-plt.savefig('traindata.png')
+plt.savefig('real-valued-function.png')
 plt.show()

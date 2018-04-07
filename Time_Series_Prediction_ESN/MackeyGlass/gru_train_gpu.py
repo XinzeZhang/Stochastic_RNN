@@ -6,7 +6,8 @@ from torch.autograd import Variable
 import torch.optim as optim
 
 import numpy as np
-from numpy import atleast_2d
+from numpy import loadtxt, atleast_2d
+# from numpy import atleast_2d
 from sklearn.metrics import mean_squared_error
 
 import matplotlib
@@ -20,14 +21,14 @@ use_cuda=torch.cuda.is_available()
 class Sequence(nn.Module):
     def __init__(self):
         super(Sequence, self).__init__()
-        self.gru1 = nn.GRUCell(1, 51)
-        self.gru2 = nn.GRUCell(51, 51)
-        self.linear = nn.Linear(51, 1)
+        self.gru1 = nn.GRUCell(1, 50)
+        self.gru2 = nn.GRUCell(50, 50)
+        self.linear = nn.Linear(50, 1)
 
     def forward(self, input, future = 0):
         outputs = []
-        h_t = Variable(torch.zeros(input.size(0), 51).double(), requires_grad=False).cuda()
-        h_t2 = Variable(torch.zeros(input.size(0), 51).double(), requires_grad=False).cuda()
+        h_t = Variable(torch.zeros(input.size(0), 50).double(), requires_grad=False).cuda()
+        h_t2 = Variable(torch.zeros(input.size(0), 50).double(), requires_grad=False).cuda()
 
         for i, input_t in enumerate(input.chunk(input.size(1), dim=1)):
             h_t= self.gru1(input_t, h_t)
@@ -55,19 +56,30 @@ if __name__ == '__main__':
         np.random.seed(0)
         torch.manual_seed(0)
         # load data and make training set
-        data = torch.load('traindata.pt')
+        # data = torch.load('real-valued-function.pt')
+
+        X = loadtxt('MackeyGlass_t17.txt')
+        X = atleast_2d(X).T
+        train_length = 2000
+        test_length = 2000
+        # data shape should be (lens_ts, n_features)
+        train_input = X[:train_length]
+        train_target = X[1:train_length+1]
+        test_input = X[train_length:train_length+test_length]
+        test_target = X[train_length+1:train_length+test_length+1]
 
         # data shape should be (batch, lens_ts)
-        input = Variable(torch.from_numpy(atleast_2d(data[0, :-1])), requires_grad=False).cuda()
-        target = Variable(torch.from_numpy(atleast_2d(data[0, 1:])), requires_grad=False).cuda()
-        test_input = Variable(torch.from_numpy(atleast_2d(data[-1, :-1])), requires_grad=False).cuda()
-        test_target = Variable(torch.from_numpy(atleast_2d(data[-1, 1:])), requires_grad=False).cuda()
+        input = Variable(torch.from_numpy(train_input.T), requires_grad=False).cuda()
+        target = Variable(torch.from_numpy(train_target.T), requires_grad=False).cuda()
+        test_input = Variable(torch.from_numpy(test_input.T), requires_grad=False).cuda()
+        test_target = Variable(torch.from_numpy(test_target.T), requires_grad=False).cuda()
         # build the model
         seq = Sequence().cuda()
         seq.double()
         criterion = nn.MSELoss()
         # use LBFGS as optimizer since we can load the whole data to train
         optimizer = optim.LBFGS(seq.parameters(), lr=0.8)
+        # optimizer = optim.SGD(seq.parameters(), lr=0.001)
         
         # Initialize timer
         time_tr_start=time.time()

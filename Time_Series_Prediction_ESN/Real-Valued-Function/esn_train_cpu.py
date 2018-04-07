@@ -13,7 +13,7 @@ import torch
 
 if __name__ == '__main__':
     # load data and make training set
-    data = torch.load('traindata.pt')
+    data = torch.load('real-valued-function.pt')
     # data shape should be (lens_ts, n_features)
     train_input = data[0, :-1]
     train_input=atleast_2d(train_input).T

@@ -61,43 +61,43 @@ if __name__ == '__main__':
     testplot.set_title('Prediction (MSE %0.8f)' % err)
     testplot.legend(loc='lower right')
     plt.tight_layout(0.5)
-    plt.savefig('MackeyGlass_Pred.png')
+    plt.savefig('MackeyGlass_Pred_ESN.png')
 
-    # Grid search
-    pipeline = Pipeline([('esn', SimpleESN(n_readout=1000)),
-                         ('ridge', Ridge(alpha = 0.01))])
-    parameters = {
-        'esn__n_readout': [1000],
-        'esn__n_components': [1000],
-        'esn__weight_scaling': [0.9, 1.25],
-        'esn__damping': [0.3],
-        'ridge__alpha': [0.01, 0.001]
-    }
-    grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1, cv=3)
-    print ("Starting grid search with parameters")
-    pprint (parameters)
-    t0 = time()
-    grid_search.fit(X_train, y_train)
-    print ("done in %0.3f s" % (time()-t0))
+    # # Grid search
+    # pipeline = Pipeline([('esn', SimpleESN(n_readout=1000)),
+    #                      ('ridge', Ridge(alpha = 0.01))])
+    # parameters = {
+    #     'esn__n_readout': [1000],
+    #     'esn__n_components': [1000],
+    #     'esn__weight_scaling': [0.9, 1.25],
+    #     'esn__damping': [0.3],
+    #     'ridge__alpha': [0.01, 0.001]
+    # }
+    # grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1, cv=3)
+    # print ("Starting grid search with parameters")
+    # pprint (parameters)
+    # t0 = time()
+    # grid_search.fit(X_train, y_train)
+    # print ("done in %0.3f s" % (time()-t0))
     
-    print ("Best score on training is: %0.8f" % grid_search.best_score_)
-    best_parameters = grid_search.best_estimator_.get_params()
-    for param_name in sorted(parameters.keys()):
-        print ("\t%s: %r" % (param_name, best_parameters[param_name]))
+    # print ("Best score on training is: %0.8f" % grid_search.best_score_)
+    # best_parameters = grid_search.best_estimator_.get_params()
+    # for param_name in sorted(parameters.keys()):
+    #     print ("\t%s: %r" % (param_name, best_parameters[param_name]))
     
-    y_true, y_pred = y_test, grid_search.predict(X_test)
-    err = mean_squared_error(y_true, y_pred)
+    # y_true, y_pred = y_test, grid_search.predict(X_test)
+    # err = mean_squared_error(y_true, y_pred)
     
-    fg = plt.figure(figsize=(9, 4))
-    echoplot = fg.add_subplot(1, 2, 1)
-    echoplot.plot(echo_train[100:600,:20])
-    echoplot.set_title('Some reservoir activation')
-    testplot =  fg.add_subplot(1, 2, 2)
-    testplot.plot(X_test[-500:], 'b', label='test signal')
-    testplot.plot(y_pred[-500:], 'g', label='prediction')
-    testplot.set_title('Prediction after GridSearch (MSE %0.8f)' % err)
-    testplot.legend(loc='lower right')
-    plt.tight_layout(0.5)
-    plt.savefig('MackeyGlass_Pred after GridSearch.png')
+    # fg = plt.figure(figsize=(9, 4))
+    # echoplot = fg.add_subplot(1, 2, 1)
+    # echoplot.plot(echo_train[100:600,:20])
+    # echoplot.set_title('Some reservoir activation')
+    # testplot =  fg.add_subplot(1, 2, 2)
+    # testplot.plot(X_test[-500:], 'b', label='test signal')
+    # testplot.plot(y_pred[-500:], 'g', label='prediction')
+    # testplot.set_title('Prediction after GridSearch (MSE %0.8f)' % err)
+    # testplot.legend(loc='lower right')
+    # plt.tight_layout(0.5)
+    # plt.savefig('MackeyGlass_Pred after GridSearch.png')
     
     
