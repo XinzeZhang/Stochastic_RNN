@@ -41,12 +41,14 @@ if __name__ == '__main__':
     # Simple training
     my_esn = SimpleESN(n_readout=1000, n_components=1000,
                        damping = 0.3, weight_scaling = 1.25)
+    t0 = time()
     echo_train = my_esn.fit_transform(X_train)
     regr = Ridge(alpha = 0.01)
     regr.fit(echo_train, y_train)
     echo_test = my_esn.transform(X_test)
     y_true, y_pred = y_test, regr.predict(echo_test)
     err = mean_squared_error(y_true, y_pred)
+    print ("done in %0.3f s" % (time()-t0))
     
     fp = plt.figure(figsize=(12, 4))
     trainplot = fp.add_subplot(1, 3, 1)

@@ -50,16 +50,16 @@ if __name__ == '__main__':
     data_figures = plt.figure(figsize=(12, 4))
     trainplot = data_figures.add_subplot(1, 3, 1)
     trainplot.plot(train_input[:], 'b')
-    trainplot.set_title('training signal')
+    trainplot.set_title('Training Signal')
 
     echoplot = data_figures.add_subplot(1, 3, 2)
     # echoplot.plot(echo_train_state[0, :20])
-    echoplot.plot(echo_train_state[:, :20])
-    echoplot.set_title('Some reservoir activation')
+    echoplot.plot(echo_train_state[:, :8])
+    echoplot.set_title('Some Reservoir Activation')
 
     testplot = data_figures.add_subplot(1, 3, 3)
-    testplot.plot(train_target[:], 'r', label='train signal')
-    testplot.plot(echo_train_pred[:], 'g', label='prediction')
+    testplot.plot(train_target[:], 'r', label='Target Signal')
+    testplot.plot(echo_train_pred[:], 'g', label='Prediction')
     testplot.set_title('Prediction (MSE %0.8f)' % err_train)
 
     testplot.legend(loc='upper right')
@@ -75,15 +75,15 @@ if __name__ == '__main__':
     data_figures = plt.figure(figsize=(12, 4))
     trainplot = data_figures.add_subplot(1, 3, 1)
     trainplot.plot(test_input[:], 'b')
-    trainplot.set_title('training signal')
+    trainplot.set_title('Test Signal')
 
     echoplot = data_figures.add_subplot(1, 3, 2)
-    echoplot.plot(echo_test_state[:, :20])
+    echoplot.plot(echo_test_state[:, :8])
     echoplot.set_title('Some reservoir activation')
 
     testplot = data_figures.add_subplot(1, 3, 3)
-    testplot.plot(test_target[:], 'r', label='test signal')
-    testplot.plot(echo_test_pred[:], 'g', label='prediction')
+    testplot.plot(test_target[:], 'r', label='Target signal')
+    testplot.plot(echo_test_pred[:], 'g', label='Prediction')
     testplot.set_title('Prediction (MSE %0.8f)' % err_test)
 
     testplot.legend(loc='upper right')
