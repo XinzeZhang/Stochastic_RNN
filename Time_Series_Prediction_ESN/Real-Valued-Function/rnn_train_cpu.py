@@ -47,7 +47,7 @@ class RNN_Model(nn.Module):
 
 if __name__ == '__main__':
     print("Using CPU I7-7700K.\n")
-    print("--- Training GRUs ---")
+    print("--- Training RNN ---")
     
     # set random seed to 0
     np.random.seed(0)

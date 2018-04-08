@@ -16,6 +16,13 @@ import matplotlib.pyplot as plt
 
 import time
 
+from pandas import DataFrame
+from pandas import Series
+from pandas import concat
+from pandas import read_csv
+from pandas import datetime
+
+from _data_process import *
 # use_cuda=torch.cuda.is_available()
 
 class RNN_Model(nn.Module):
@@ -48,22 +55,54 @@ class RNN_Model(nn.Module):
 if __name__ == '__main__':
     print("Using CPU I7-7700K.\n")
     print("--- Training RNN ---")
-    
+    # load dataset
+    series = read_csv('chinese_oil_production.csv', header=0,
+                      parse_dates=[0], index_col=0, squeeze=True)
+
+    # transfer the dataset to array
+    raw_values = series.values
+    ts_values_array = np.array(raw_values)
+    set_length = len(ts_values_array)
+
+    # transform data to be stationary
+    dataset_difference = difference(raw_values, 1)
+
+    # creat dataset train, test
+    # ts_look_back = 12
+    using_difference = False
+    Diff=''
+    if using_difference==True:
+        Diff='_Diff'
+    if using_difference == True:
+            # using dataset_diference for training
+        dataset = dataset_difference
+    else:
+        # using dataset for training
+        dataset = ts_values_array
+
+    # split into train and test sets
+    train_size = int(len(dataset) * 0.8)
+    print('train_size: %i' % train_size)
+
+    datset=atleast_2d(dataset).T
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaler=scaler.fit(datset)
+    dataset_scaled=scaler.fit_transform(datset)
+
+
+    train, test = dataset_scaled[0:train_size,:], dataset_scaled[train_size:,:]
+    # data shape should be (lens_ts, n_features)
+    train_input = train[:-1,:]
+
+    train_target = train[1:,:]
+
+    test_input=test[:-1,:]
+
+    test_target=test[1:,:]
+
     # set random seed to 0
     np.random.seed(0)
     torch.manual_seed(0)
-    # load data and make training set
-    # data = torch.load('real-valued-function.pt')
-
-    X = loadtxt('MackeyGlass_t17.txt')
-    X = atleast_2d(X).T
-    train_length = 2000
-    test_length = 2000
-    # data shape should be (lens_ts, n_features)
-    train_input = X[:train_length]
-    train_target = X[1:train_length+1]
-    test_input = X[train_length:train_length+test_length]
-    test_target = X[train_length+1:train_length+test_length+1]
 
     # data shape should be (batch, lens_ts)
     input = Variable(torch.from_numpy(train_input.T), requires_grad=False)
@@ -95,7 +134,7 @@ if __name__ == '__main__':
         loss.backward()
         return loss
     #begin to train
-    for i in range(8):
+    for i in range(9):
         optimizer.step(closure)
         # record train time
         training_time = time.time()-time_tr_start
@@ -106,7 +145,7 @@ if __name__ == '__main__':
     plt.figure(figsize=(10,10))
     plt.plot(rnn_loss)
     plt.title('Loss of Training RNN \n (Final MSE: %0.8f, Total Time: %i s)' % (rnn_loss[-1], time.time()-time_tr_start))
-    plt.savefig('MackeyGlass_Loss_RNN.png')
+    plt.savefig('RealWorld_Loss_RNN9.png')
     # plt.show()
 
     # begin to predict
@@ -125,12 +164,12 @@ if __name__ == '__main__':
     plt.xticks()
     plt.yticks()
     def draw(yi, color, lable_name):
-        plt.plot(np.arange(input.size(1)), yi[:input.size(1)], color,label=lable_name, linewidth = 1.0)
+        plt.plot(np.arange(len(yi)), yi, color,label=lable_name, linewidth = 1.0)
         # plt.plot(np.arange(input.size(1), input.size(1) + future), yi[input.size(1):], color + ':', linewidth = 2.0)
     draw(test_target.data.numpy()[0], 'r','Test Target')
     draw(y_pred[0], 'g','Test Prediction')
     plt.legend(loc='upper right')
     # draw(y[2], 'b')
     # plt.show()
-    plt.savefig('MackeyGlass_RNN.png')
+    plt.savefig('RealWorld_RNN9.png')
     # plt.close()}
