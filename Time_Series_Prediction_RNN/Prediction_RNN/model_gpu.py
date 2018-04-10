@@ -243,7 +243,7 @@ class RNNModel(BaseModel):
     
     def initHidden(self,input):
         batchSize=input.size(0)
-        result = Variable(torch.zeros(self.Num_layers * 1, batchSize, self.Hidden_Size)).cuda()
+        result = Variable(torch.zeros(self.Num_layers * 1, batchSize, self.Hidden_Size).float()).cuda()
         return result
     
     def fit(self, input, target):
@@ -302,7 +302,7 @@ class RNNModel(BaseModel):
         # Plot loss figure
         plot_loss(plot_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
         print('\n------------------------------------------------')
-        print('GRU Model finished fitting')
+        print('RNN Model finished fitting')
         print('------------------------------------------------')
 
         return self
