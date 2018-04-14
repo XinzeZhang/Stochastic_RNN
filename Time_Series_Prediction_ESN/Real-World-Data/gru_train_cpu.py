@@ -115,7 +115,7 @@ if __name__ == '__main__':
     criterion = nn.MSELoss()
     # use LBFGS as optimizer since we can load the whole data to train
     # optimizer = optim.LBFGS(seq.parameters(), lr=0.8, history_size=50)
-    optimizer = optim.SGD(seq.parameters(), lr=0.01)
+    optimizer = optim.SGD(seq.parameters(), lr=0.001)
     
     # Initialize timer
     time_tr_start=time.time()
@@ -134,7 +134,7 @@ if __name__ == '__main__':
         loss.backward()
         return loss
     #begin to train
-    for i in range(1000):
+    for i in range(6000):
         optimizer.step(closure)
         # record train time
         training_time = time.time()-time_tr_start
