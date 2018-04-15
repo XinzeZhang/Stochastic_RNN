@@ -92,9 +92,9 @@ class GRUModel(BaseModel):
         target=target.cuda()
         GRU_h_state=self.initHidden(input)
         criterion = nn.MSELoss()
-        if self.Optim_method=='_SGD':
+        if self.Optim_method=='SGD':
             optimizer = optim.SGD(self.parameters(), lr=self.Learn_rate)
-        if self.Optim_method=='_Adam':
+        if self.Optim_method=='Adam':
             optimizer = optim.Adam(self.parameters(), lr=self.Learn_rate)
 
         # Initialize timer
@@ -141,7 +141,7 @@ class GRUModel(BaseModel):
                 plot_loss_total = 0
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
+        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+'_'+self.Optim_method)
         print('\n------------------------------------------------')
         print('GRU Model finished fitting')
         print('------------------------------------------------')
@@ -165,10 +165,12 @@ class GRUModel(BaseModel):
         target=target.cuda()
         GRU_h_state=self.initHidden(input)
         criterion = nn.MSELoss()
-        if self.Optim_method=='_SGD':
+        if self.Optim_method=='SGD':
             optimizer = optim.SGD(self.parameters(), lr=self.Learn_rate)
-        if self.Optim_method=='_Adam':
+        if self.Optim_method=='Adam':
             optimizer = optim.Adam(self.parameters(), lr=self.Learn_rate)
+        if self.Optim_method=='RMSprop':
+            optimizer = optim.RMSprop(self.parameters(), lr=self.Learn_rate)
 
         # Initialize timer
         time_tr_start = time.time()
@@ -205,7 +207,7 @@ class GRUModel(BaseModel):
                 plot_loss_total = 0
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
+        plot_loss(plot_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+'_'+self.Optim_method)
         print('\n------------------------------------------------')
         print('GRU Model finished fitting')
         print('------------------------------------------------')
@@ -251,10 +253,22 @@ class RNNModel(BaseModel):
         target=target.cuda()
         RNN_h_state=self.initHidden(input)
         criterion = nn.MSELoss()
-        if self.Optim_method=='_SGD':
-            optimizer = optim.SGD(self.parameters(), lr=self.Learn_rate)
-        if self.Optim_method=='_Adam':
+        if self.Optim_method=='ASGD':
+            optimizer = optim.ASGD(self.parameters(), lr=self.Learn_rate)
+        elif self.Optim_method=='Adam':
             optimizer = optim.Adam(self.parameters(), lr=self.Learn_rate)
+        elif self.Optim_method=='RMSprop':
+            optimizer = optim.RMSprop(self.parameters(), lr=self.Learn_rate)
+        elif self.Optim_method=='Adadelta':
+            optimizer = optim.Adadelta(self.parameters(), lr=self.Learn_rate)            
+        elif self.Optim_method=='Adagrad':
+            optimizer = optim.Adagrad(self.parameters(), lr=self.Learn_rate)  
+        elif self.Optim_method=='SparseAdam':
+            optimizer = optim.Adagrad(self.parameters(), lr=self.Learn_rate)
+        elif self.Optim_method=='Adamax':
+            optimizer = optim.Adamax(self.parameters(), lr=self.Learn_rate)  
+        elif self.Optim_method=='SGD':
+            optimizer = optim.SGD(self.parameters(), lr=self.Learn_rate, momentum=0.9)  
 
         # Initialize timer
         time_tr_start = time.time()
@@ -300,7 +314,7 @@ class RNNModel(BaseModel):
                 plot_loss_total = 0
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
+        plot_loss(plot_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+'_'+self.Optim_method)
         print('\n------------------------------------------------')
         print('RNN Model finished fitting')
         print('------------------------------------------------')
@@ -324,9 +338,9 @@ class RNNModel(BaseModel):
         target=target.cuda()
         RNN_h_state=self.initHidden(input)
         criterion = nn.MSELoss()
-        if self.Optim_method=='_SGD':
+        if self.Optim_method=='SGD':
             optimizer = optim.SGD(self.parameters(), lr=self.Learn_rate)
-        if self.Optim_method=='_Adam':
+        if self.Optim_method=='Adam':
             optimizer = optim.Adam(self.parameters(), lr=self.Learn_rate)
 
         # Initialize timer
@@ -364,7 +378,7 @@ class RNNModel(BaseModel):
                 plot_loss_total = 0
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+self.Optim_method)
+        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+ '_'+self.Optim_method)
         print('\n------------------------------------------------')
         print('GRU Model finished fitting')
         print('------------------------------------------------')

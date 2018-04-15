@@ -50,12 +50,12 @@ if __name__ == '__main__':
  # ========================================================================================
     # hyper parameters
     Num_layers = 1
-    Num_iters = 100000
+    Num_iters = 6000
     Hidden_size = 100
     Print_interval = 50
     Plot_interval = 10
     # 'SGD' or 'Adam' or 'RMSprop' or 'Adadelta' or 'Adagrad' or 'SparseAdam' or 'Adamax' or 'ASGD'
-    Optim_method = 'SGD'
+    Optim_method = 'Adam'
     Learning_rate = 0.001
     Cell = "GRU"
 
