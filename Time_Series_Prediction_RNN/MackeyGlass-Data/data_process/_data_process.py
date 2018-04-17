@@ -155,17 +155,17 @@ def plot_regression_result(Train_target,Train_pred,Test_target, Test_pred, Loss_
     plt.figure(figsize=(20, 5))
     plt.title(
         'Regression Future Values for Time Series', fontsize=12)
-    plt.title('MSE of Prediction: %(mse).3e' %
-              {'mse': Loss_pred}, loc='right', fontsize=10)
+    plt.title('RMSE of Prediction: %(rmse).3e' %
+              {'rmse': Loss_pred}, loc='right', fontsize=10)
     plt.xlabel('x', fontsize=10)
     plt.ylabel('y', fontsize=10)
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
 
-    plt.plot(train_scope, Train_target, 'y-', label='Training Target', linewidth=1)
-    plt.plot(train_scope, Train_pred, 'g-', label='Training Result', linewidth=1)
-    plt.plot(test_scope, Test_target, 'r-', label='Test Target', linewidth=1)
-    plt.plot(test_scope, Test_pred, 'b-', label='Test Result', linewidth=1)
+    # plt.plot(train_scope, Train_target, 'c-', label='Training Target', linewidth=1)
+    # plt.plot(train_scope, Train_pred, 'm-', label='Training Result', linewidth=1)
+    plt.plot(test_scope, Test_target, 'b-', label='Test Target', linewidth=1)
+    plt.plot(test_scope, Test_pred, 'r-', label='Test Result', linewidth=1)
 
     plt.legend(loc='upper right')
     plt.savefig(Fig_name + '.png')
@@ -203,7 +203,7 @@ def plot_loss(points, Fig_name):
     plt.savefig(Fig_name + '.png')
     plt.close()
 
-def plot_train(train_losses,validate_losses, Fig_name):
+def plot_train(train_losses,validate_losses,Fig_title ,Fig_name):
     plt.figure(figsize=(5,5))
     # fig, ax = plt.subplots()
     # # this locator puts ticks at regular intervals
@@ -212,8 +212,10 @@ def plot_train(train_losses,validate_losses, Fig_name):
     plt.plot(train_losses, 'g-', label= 'Training Loss')
     plt.plot(validate_losses, 'b-', label='Validating Loss')
     plt.legend(loc='upper right')
-    plt.title('Loss of %(fig_name)s \n(Final Training loss:%(train_loss).3e)' %
-              {'fig_name': Fig_name, 'train_loss': train_losses[-1]}, fontsize=12)
+    plt.title('Loss of %(fig_title)s \n' %
+              {'fig_title': Fig_title}, fontsize=12)
+    plt.title('Final Training RMSE:%(train_loss).3e' %
+              {'train_loss':  train_losses[-1]}, loc='right', fontsize=10)
     plt.savefig(Fig_name + '.png')
     plt.close()
 

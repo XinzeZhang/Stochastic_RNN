@@ -50,9 +50,6 @@ class BaseModel(nn.Module):
             self.Cell = nn.GRU(input_size=self.Input_dim, hidden_size=self.Hidden_Size,
                                num_layers=self.Num_layers, dropout=0.0,
                                batch_first=True,)
-        print('================================================')
-        print(self.Cell)
-        print('================================================\n')
         self.fc = nn.Linear(self.Hidden_Size, self.Output_dim)
 
 # GRU模型
@@ -94,6 +91,11 @@ class GRUModel(BaseModel):
         return result
 
     def fit(self, input, target):
+        print('================================================')
+        # print(self.Cell)
+        print(self.cell_name+'_L'+str(self.Num_layers) + '_H' +
+              str(self.Hidden_Size)+'_I'+str(self.Num_iters)+'_'+self.Optim_method)
+        print('================================================\n')        
         input = input.cuda()
         target = target.cuda()
         GRU_h_state = self.initHidden(input)
@@ -236,6 +238,11 @@ class RNNModel(BaseModel):
         self.Num_iters = num_iters
         self.Optim_method = optim_method
         self.Learn_rate = learning_rate
+        print('================================================')
+        # print(self.Cell)
+        print(self.cell_name+'_L'+str(self.Num_layers) + '_H' +
+              str(self.Hidden_Size)+'_I'+str(self.Num_iters)+'_'+self.Optim_method)
+        print('================================================\n')        
 
     def forward(self, input, h_state):
         # input: shape[batch,time_step,input_dim]
@@ -346,7 +353,7 @@ class RNNModel(BaseModel):
         y_pred = y_pred.cpu().data.numpy()
         return y_pred
 
-    def fit_validate(self, train_input, train_target, validate_input, validate_target):
+    def fit_validate(self, train_input, train_target, validate_input, validate_target, save_road='./Results/'):
         train_input = train_input.cuda()
         train_target = train_target.cuda()
         validate_input = validate_input.cuda()
@@ -400,16 +407,18 @@ class RNNModel(BaseModel):
             prediction, RNN_h_state = self.forward(train_input, RNN_h_state)
             RNN_h_state = Variable(RNN_h_state.data).cuda()
             loss = criterion(prediction, train_target)
-            train_plot_loss_total += loss.data[0]
-            train_print_loss_total += loss.data[0]
+            training_rmse = np.sqrt(loss.data[0])
+            train_plot_loss_total += training_rmse
+            train_print_loss_total += training_rmse
             optimizer.zero_grad()
             loss.backward()
 
             validate_prediction, validate_RNN_h_state_pred = self.forward(
                 validate_input, validate_RNN_h_state)
             validate_loss = criterion(validate_prediction, validate_target)
-            validate_print_loss_total += validate_loss.data[0]
-            validate_plot_loss_total += validate_loss.data[0]
+            validate_rmse = np.sqrt(validate_loss.data[0])
+            validate_print_loss_total += validate_rmse
+            validate_plot_loss_total += validate_rmse
 
             optimizer.step()
 
@@ -428,7 +437,7 @@ class RNNModel(BaseModel):
 
                 print('%s (%d %d%%) ' % (timeSince(time_tr_start, iter / self.Num_iters),
                                          iter, iter / self.Num_iters * 100))
-                print('Training Loss:  \t %.8f\nValidating Loss:\t %.8f' %
+                print('Training RMSE:  \t %.3e\nValidating RMSE:\t %.3e' %
                       (print_loss_avg, validate_print_loss_avg))
 
             if iter % self.Plot_interval == 0:
@@ -441,15 +450,18 @@ class RNNModel(BaseModel):
                 validate_plot_loss_total = 0
 
         # Plot loss figure
-        plot_train(training_losses, validate_losses, Fig_name='Loss_'+self.cell_name+'_L'+str(self.Num_layers) +
-                   '_H'+str(self.Hidden_Size)+'_I'+str(self.Num_iters)+'_'+self.Optim_method)
+        # Plot RMSE Loss Figure
+        training_losses = np.sqrt(training_losses)
+        validate_losses = np.sqrt(validate_losses)
+        plot_train(training_losses, validate_losses, Fig_title=self.cell_name+'_L'+str(self.Num_layers)+'_H'+str(self.Hidden_Size)+'_E'+str(self.Num_iters)+'_' +
+                   self.Optim_method, Fig_name=save_road+'_Loss_'+self.cell_name+'_L'+str(self.Num_layers) + '_H'+str(self.Hidden_Size)+'_E'+str(self.Num_iters)+'_'+self.Optim_method)
         print('\n------------------------------------------------')
         print('RNN Model finished fitting')
         print('------------------------------------------------')
 
         return self
 
-    def fit_view(self, input, target, view_interval):
+    def fit_view(self, input, target, view_interval, save_road='./Results/'):
 
         self.View_interval = view_interval
         input = input.cuda()
@@ -496,8 +508,8 @@ class RNNModel(BaseModel):
                 train_plot_loss_total = 0
 
         # Plot loss figure
-        plot_loss(plot_losses, Fig_name='Loss'+'_L'+str(self.Num_layers)+'_H' +
-                  str(self.Hidden_Size)+'_I'+str(self.Num_iters) + '_'+self.Optim_method)
+        plot_loss(plot_losses, Fig_name=save_road+'_Loss'+'_L'+str(self.Num_layers)+'_H' +
+                  str(self.Hidden_Size)+'_E'+str(self.Num_iters) + '_'+self.Optim_method)
         print('\n------------------------------------------------')
         print('GRU Model finished fitting')
         print('------------------------------------------------')

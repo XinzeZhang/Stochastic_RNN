@@ -9,7 +9,7 @@ np.random.seed(0)
 Amplifier_Times = 20
 left_bound=0
 right_bound=1
-L = 600
+L = 601
 N = 100
 
 x = np.empty((N, L), 'float64')
