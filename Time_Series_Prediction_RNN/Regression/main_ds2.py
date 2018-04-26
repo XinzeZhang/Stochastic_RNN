@@ -6,8 +6,6 @@ import torch.optim as optim
 
 import numpy as np
 from numpy import loadtxt, atleast_2d
-# from numpy import atleast_2d
-from sklearn.metrics import mean_squared_error
 
 import matplotlib
 matplotlib.use('Agg')
@@ -17,6 +15,7 @@ import time
 
 from models.model_gpu import RNNModel
 from data_process._data_process import create_dataset, plot_regression_result
+
 
 def RNN_Benchmark(input_dim,
                   Hidden_size,
@@ -58,9 +57,9 @@ def RNN_Benchmark(input_dim,
     # Train_ViewList = Model_ViewList[1]
     # ---------------------------------------------------------------------------------------
     # begin to forcast
-    print('\n------------------------------------------------')
-    print('Forecasting Testing Data')
-    print('------------------------------------------------')
+    # print('\n------------------------------------------------')
+    # print('Forecasting Testing Data')
+    # print('------------------------------------------------')
 
     Y_train = RNN_Demo.predict(train_input)
     Y_train = Y_train[0, :, 0]
@@ -97,6 +96,7 @@ def RNN_Benchmark(input_dim,
                            Loss_pred=RMSE_pred,
                            Fig_name=plot_fig_name)
 
+
 if __name__ == '__main__':
     print("Using GPU GTX1070.\n")
     print("--- Training RNN ---")
@@ -104,25 +104,40 @@ if __name__ == '__main__':
     # set random seed to 0
     np.random.seed(0)
     torch.manual_seed(0)
-    # load data and make training set
-    data = torch.load('./Datasets/real-valued-function.pt')
+    # load data_MackeyGlass and make training set
+    # data_Real_Valued = torch.load('real-valued-function.pt')
+    data_MackeyGlass = loadtxt('./Datasets/MackeyGlass_t17.txt')
 
-    # data shape should be (batch, lens_ts, input_dim)
-    train_input = atleast_2d(data[0, :-1])[:, :, np.newaxis]
-    train_target = atleast_2d(data[0, 1:])[:, :, np.newaxis]
+    data_MackeyGlass = atleast_2d(data_MackeyGlass).T
+    train_length = 600
+    test_length = 600
+    validate_length = 600
+    # data_MackeyGlass shape should be (batch, ts_lens) which means input_dim=1
+    train_input = data_MackeyGlass[:train_length].T
+    train_target = data_MackeyGlass[1:train_length+1].T
     # --
-    train_target_plot = data[0, 1:]
+    test_input = data_MackeyGlass[train_length:train_length+test_length].T
+    test_target = data_MackeyGlass[train_length+1:train_length+test_length+1].T
     # --
-    test_input = atleast_2d(data[-1, :-1])[:, :, np.newaxis]
-    test_target = atleast_2d(data[-1, 1:])[:, :, np.newaxis]
-    test_target_plot = data[-1, 1:]
+    validate_input = data_MackeyGlass[train_length +
+                                      test_length:train_length+test_length+validate_length].T
+    validate_target = data_MackeyGlass[train_length +
+                                       test_length+1:train_length+test_length+validate_length+1].T
     # --
-    validate_input = atleast_2d(data[1, :-1])[:, :, np.newaxis]
-    validate_target = atleast_2d(data[1, :-1])[:, :, np.newaxis]
+    train_target_plot = train_target[0, :]
+    test_target_plot = test_target[0, :]
 
+    # data_MackeyGlass shape should be (batch, lens_ts, input_dim)
+    train_input = atleast_2d(train_input)[:, :, np.newaxis]
+    train_target = atleast_2d(train_target)[:, :, np.newaxis]
+    # --
+    test_input = atleast_2d(test_input)[:, :, np.newaxis]
+    test_target = atleast_2d(test_target)[:, :, np.newaxis]
+    # --
+    validate_input = atleast_2d(validate_input)[:, :, np.newaxis]
+    validate_target = atleast_2d(validate_target)[:, :, np.newaxis]
 
-
-    # data shape should be (batch, lens_ts, input_dim)
+    # data_MackeyGlass shape should be (batch, lens_ts, input_dim)
     train_input = Variable(torch.from_numpy(
         train_input).float(), requires_grad=False)
     train_target = Variable(torch.from_numpy(
@@ -145,7 +160,7 @@ if __name__ == '__main__':
     # # Optim_method:
     # 'SGD' or 'Adam' or 'RMSprop' or 'Adadelta' or 'Adagrad' or 'SparseAdam' or 'Adamax' or 'ASGD'
     
-     # benchmark 1.1 rnn h100 i1120
+    # benchmark 1.1 rnn h100 i1120
     RNN_Benchmark(input_dim=1,
                     Hidden_size=100,
                     output_dim=1,
@@ -339,4 +354,4 @@ if __name__ == '__main__':
                     validate_input=validate_input,
                     validate_target=validate_target,
                     test_input=test_input,
-                    test_target=test_target)
+                    test_target=test_target)                            

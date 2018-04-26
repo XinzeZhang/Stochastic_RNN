@@ -157,8 +157,8 @@ def plot_regression_result(Train_target,Train_pred,Test_target, Test_pred, Loss_
         'Regression Future Values for Time Series', fontsize=12)
     plt.title('RMSE of Prediction: %(rmse).3e' %
               {'rmse': Loss_pred}, loc='right', fontsize=10)
-    plt.xlabel('x', fontsize=10)
-    plt.ylabel('y', fontsize=10)
+    plt.xlabel('Input Sequence', fontsize=10)
+    plt.ylabel('Value', fontsize=10)
     plt.xticks(fontsize=10)
     plt.yticks(fontsize=10)
 
@@ -216,6 +216,10 @@ def plot_train(train_losses,validate_losses,Fig_title ,Fig_name):
               {'fig_title': Fig_title}, fontsize=12)
     plt.title('Final Training RMSE:%(train_loss).3e' %
               {'train_loss':  train_losses[-1]}, loc='right', fontsize=10)
+    plt.xlabel('Iteration Epoch', fontsize=10)
+    plt.ylabel('Loss', fontsize=10)
+    plt.xticks(fontsize=10)
+    plt.yticks(fontsize=10)
     plt.savefig(Fig_name + '.png')
     plt.close()
 
