@@ -19,7 +19,7 @@ import math
 
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
+# from torch.autograd import Variable
 import torch.optim as optim
 
 import time
@@ -65,20 +65,20 @@ if __name__ == '__main__':
     # ---------------------------------------------------------------------------------------
     # load data and make training set
     train_input_scaled = train_scaled[:, :-1, np.newaxis]
-    train_input = Variable(torch.from_numpy(
-        train_input_scaled).float(), requires_grad=False)
+    train_input =  torch.from_numpy(
+        train_input_scaled).float() 
 
     train_target_scaled = train_scaled[:, 1:]
-    train_target = Variable(torch.from_numpy(
-        train_target_scaled).float(), requires_grad=False)
+    train_target =  torch.from_numpy(
+        train_target_scaled).float() 
 
     test_input_scaled = test_scaled[:, :-1, np.newaxis]
-    test_input = Variable(torch.from_numpy(
-        test_input_scaled).float(), requires_grad=False)
+    test_input =  torch.from_numpy(
+        test_input_scaled).float() 
 
     test_target_scaled = test_scaled[:, 1:]
-    test_target = Variable(torch.from_numpy(
-        test_target_scaled).float(), requires_grad=False)
+    test_target =  torch.from_numpy(
+        test_target_scaled).float() 
 
     # ========================================================================================
     # hyper parameters
@@ -128,8 +128,8 @@ if __name__ == '__main__':
 
     # get prediction loss
     MSE_loss = nn.MSELoss()
-    Y_pred_torch = Variable(torch.from_numpy(Y_pred).float(), requires_grad=False)
-    Y_target_torch = Variable(torch.from_numpy(Y_target).float(), requires_grad=False)
+    Y_pred_torch =  torch.from_numpy(Y_pred).float() 
+    Y_target_torch =  torch.from_numpy(Y_target).float() 
     MSE_pred = MSE_loss(Y_pred_torch, Y_target_torch)
     MSE_pred = MSE_pred.data.numpy()
 

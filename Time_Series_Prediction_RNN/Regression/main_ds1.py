@@ -1,7 +1,7 @@
 from __future__ import print_function
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
+# from torch.autograd import Variable
 import torch.optim as optim
 
 import numpy as np
@@ -17,6 +17,7 @@ import time
 
 from models.model_gpu import RNNModel
 from data_process._data_process import create_dataset, plot_regression_result
+
 
 def RNN_Benchmark(input_dim,
                   Hidden_size,
@@ -72,8 +73,8 @@ def RNN_Benchmark(input_dim,
 
     # get prediction loss
     MSE_loss = nn.MSELoss()
-    Y_pred_torch = Variable(torch.from_numpy(
-        Y_pred).float(), requires_grad=False)
+    Y_pred_torch = torch.from_numpy(
+        Y_pred).float()
     Y_target_torch = test_target
     MSE_pred = MSE_loss(Y_pred_torch, Y_target_torch)
     MSE_pred = MSE_pred.data.numpy()
@@ -87,8 +88,8 @@ def RNN_Benchmark(input_dim,
         str(Num_layers) + '_H' + str(Hidden_size) + \
         '_E' + str(Num_iters)+'_'+Optim_method
 
-    train_target_plot=train_target.data.numpy()[0,:,0]
-    test_target_plot=test_target.data.numpy()[0,:,0]
+    train_target_plot = train_target.data.numpy()[0, :, 0]
+    test_target_plot = test_target.data.numpy()[0, :, 0]
 
     plot_regression_result(Train_target=train_target_plot,
                            Test_target=test_target_plot,
@@ -96,6 +97,7 @@ def RNN_Benchmark(input_dim,
                            Test_pred=Y_pred,
                            Loss_pred=RMSE_pred,
                            Fig_name=plot_fig_name)
+
 
 if __name__ == '__main__':
     print("Using GPU GTX1070.\n")
@@ -120,23 +122,21 @@ if __name__ == '__main__':
     validate_input = atleast_2d(data[1, :-1])[:, :, np.newaxis]
     validate_target = atleast_2d(data[1, :-1])[:, :, np.newaxis]
 
-
-
     # data shape should be (batch, lens_ts, input_dim)
-    train_input = Variable(torch.from_numpy(
-        train_input).float(), requires_grad=False)
-    train_target = Variable(torch.from_numpy(
-        train_target).float(), requires_grad=False)
+    train_input = torch.from_numpy(
+        train_input).float()
+    train_target = torch.from_numpy(
+        train_target).float()
     # --
-    test_input = Variable(torch.from_numpy(
-        test_input).float(), requires_grad=False)
-    test_target = Variable(torch.from_numpy(
-        test_target).float(), requires_grad=False)
+    test_input = torch.from_numpy(
+        test_input).float()
+    test_target = torch.from_numpy(
+        test_target).float()
     # --
-    validate_input = Variable(torch.from_numpy(
-        validate_input).float(), requires_grad=False)
-    validate_target = Variable(torch.from_numpy(
-        validate_target).float(), requires_grad=False)
+    validate_input = torch.from_numpy(
+        validate_input).float()
+    validate_target = torch.from_numpy(
+        validate_target).float()
 
  # ========================================================================================
     # hyper parameters
@@ -144,199 +144,198 @@ if __name__ == '__main__':
     # 'GRU' or 'RNN'
     # # Optim_method:
     # 'SGD' or 'Adam' or 'RMSprop' or 'Adadelta' or 'Adagrad' or 'SparseAdam' or 'Adamax' or 'ASGD'
-    
-     # benchmark 1.1 rnn h100 i1120
-    RNN_Benchmark(input_dim=1,
-                    Hidden_size=100,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='RNN',
-                    Num_iters=500,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=500,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
-    RNN_Benchmark(input_dim=1,
-                    Hidden_size=100,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='RNN',
-                    Num_iters=1000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=1000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
-    RNN_Benchmark(input_dim=1,
-                    Hidden_size=500,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='RNN',
-                    Num_iters=1000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=1000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
-    RNN_Benchmark(input_dim=1,
-                    Hidden_size=500,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='RNN',
-                    Num_iters=3000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=3000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
-    RNN_Benchmark(input_dim=1,
-                    Hidden_size=1000,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='RNN',
-                    Num_iters=3000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=3000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
-    RNN_Benchmark(input_dim=1,
-                    Hidden_size=1000,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='RNN',
-                    Num_iters=6000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=6000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
 
+    # benchmark 1.1 rnn h100 i1120
+    RNN_Benchmark(input_dim=1,
+                  Hidden_size=100,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='RNN',
+                  Num_iters=500,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=50,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
+    RNN_Benchmark(input_dim=1,
+                  Hidden_size=100,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='RNN',
+                  Num_iters=1000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=1000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
+    RNN_Benchmark(input_dim=1,
+                  Hidden_size=500,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='RNN',
+                  Num_iters=1000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=1000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
+    RNN_Benchmark(input_dim=1,
+                  Hidden_size=500,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='RNN',
+                  Num_iters=3000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=3000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
+    RNN_Benchmark(input_dim=1,
+                  Hidden_size=1000,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='RNN',
+                  Num_iters=3000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=3000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
+    RNN_Benchmark(input_dim=1,
+                  Hidden_size=1000,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='RNN',
+                  Num_iters=6000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=6000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
 
     RNN_Benchmark(input_dim=1,
-                    Hidden_size=100,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='GRU',
-                    Num_iters=500,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=500,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
+                  Hidden_size=100,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='GRU',
+                  Num_iters=500,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=500,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
     RNN_Benchmark(input_dim=1,
-                    Hidden_size=100,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='GRU',
-                    Num_iters=1000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=1000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
+                  Hidden_size=100,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='GRU',
+                  Num_iters=1000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=1000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
     RNN_Benchmark(input_dim=1,
-                    Hidden_size=500,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='GRU',
-                    Num_iters=1000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=1000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
+                  Hidden_size=500,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='GRU',
+                  Num_iters=1000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=1000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
     RNN_Benchmark(input_dim=1,
-                    Hidden_size=500,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='GRU',
-                    Num_iters=3000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=3000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
+                  Hidden_size=500,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='GRU',
+                  Num_iters=3000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=3000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
     RNN_Benchmark(input_dim=1,
-                    Hidden_size=1000,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='GRU',
-                    Num_iters=3000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=3000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
+                  Hidden_size=1000,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='GRU',
+                  Num_iters=3000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=3000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)
     RNN_Benchmark(input_dim=1,
-                    Hidden_size=1000,
-                    output_dim=1,
-                    Num_layers=1,
-                    RNN_Cell='GRU',
-                    Num_iters=6000,
-                    Optim_method='Adam',
-                    Learning_rate=0.001,
-                    Print_interval=6000,
-                    Plot_interval=1,
-                    train_input=train_input,
-                    train_target=train_target,
-                    validate_input=validate_input,
-                    validate_target=validate_target,
-                    test_input=test_input,
-                    test_target=test_target)
+                  Hidden_size=1000,
+                  output_dim=1,
+                  Num_layers=1,
+                  RNN_Cell='GRU',
+                  Num_iters=6000,
+                  Optim_method='Adam',
+                  Learning_rate=0.001,
+                  Print_interval=6000,
+                  Plot_interval=1,
+                  train_input=train_input,
+                  train_target=train_target,
+                  validate_input=validate_input,
+                  validate_target=validate_target,
+                  test_input=test_input,
+                  test_target=test_target)

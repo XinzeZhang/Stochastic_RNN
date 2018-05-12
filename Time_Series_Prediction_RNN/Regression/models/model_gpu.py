@@ -86,8 +86,8 @@ class GRUModel(BaseModel):
 
     def initHidden(self, input):
         batchSize = input.size(0)
-        result = Variable(torch.zeros(self.Num_layers * 1,
-                                      batchSize, self.Hidden_Size)).cuda()
+        result = torch.zeros(self.Num_layers * 1,
+                                      batchSize, self.Hidden_Size).cuda()
         return result
 
     def fit(self, input, target):
@@ -124,10 +124,10 @@ class GRUModel(BaseModel):
             # h_state: shape[layer_num*direction,batch,hidden_size]
             # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, GRU_h_state = self.forward(input, GRU_h_state)
-            GRU_h_state = Variable(GRU_h_state.data).cuda()
+            GRU_h_state = GRU_h_state.data.cuda()
             loss = criterion(prediction, target)
-            train_plot_loss_total += loss.data[0]
-            train_print_loss_total += loss.data[0]
+            train_plot_loss_total += loss.item()
+            train_print_loss_total += loss.item()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -195,10 +195,10 @@ class GRUModel(BaseModel):
             # h_state: shape[layer_num*direction,batch,hidden_size]
             # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, GRU_h_state = self.forward(input, GRU_h_state)
-            GRU_h_state = Variable(GRU_h_state.data).cuda()
+            GRU_h_state = GRU_h_state.data.cuda()
             loss = criterion(prediction, target)
-            train_plot_loss_total += loss.data[0]
-            train_print_loss_total += loss.data[0]
+            train_plot_loss_total += loss.item()
+            train_print_loss_total += loss.item()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -263,8 +263,8 @@ class RNNModel(BaseModel):
 
     def initHidden(self, input):
         batchSize = input.size(0)
-        result = Variable(torch.zeros(self.Num_layers * 1,
-                                      batchSize, self.Hidden_Size).float()).cuda()
+        result = torch.zeros(self.Num_layers * 1,
+                                      batchSize, self.Hidden_Size).float().cuda()
         return result
 
     def fit(self, input, target):
@@ -309,10 +309,10 @@ class RNNModel(BaseModel):
             # h_state: shape[layer_num*direction,batch,hidden_size]
             # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, RNN_h_state = self.forward(input, RNN_h_state)
-            RNN_h_state = Variable(RNN_h_state.data).cuda()
+            RNN_h_state = RNN_h_state.data.cuda()
             loss = criterion(prediction, target)
-            train_plot_loss_total += loss.data[0]
-            train_print_loss_total += loss.data[0]
+            train_plot_loss_total += loss.item()
+            train_print_loss_total += loss.item()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -405,9 +405,9 @@ class RNNModel(BaseModel):
             # h_state: shape[layer_num*direction,batch,hidden_size]
             # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, RNN_h_state = self.forward(train_input, RNN_h_state)
-            RNN_h_state = Variable(RNN_h_state.data).cuda()
+            RNN_h_state = RNN_h_state.data.cuda()
             loss = criterion(prediction, train_target)
-            training_rmse = np.sqrt(loss.data[0])
+            training_rmse = np.sqrt(loss.item())
             train_plot_loss_total += training_rmse
             train_print_loss_total += training_rmse
             optimizer.zero_grad()
@@ -416,7 +416,7 @@ class RNNModel(BaseModel):
             validate_prediction, validate_RNN_h_state_pred = self.forward(
                 validate_input, validate_RNN_h_state)
             validate_loss = criterion(validate_prediction, validate_target)
-            validate_rmse = np.sqrt(validate_loss.data[0])
+            validate_rmse = np.sqrt(validate_loss.item())
             validate_print_loss_total += validate_rmse
             validate_plot_loss_total += validate_rmse
 
@@ -487,10 +487,10 @@ class RNNModel(BaseModel):
             # h_state: shape[layer_num*direction,batch,hidden_size]
             # rnn_output: shape[batch,time_sequence_length,hidden_size]
             prediction, RNN_h_state = self.forward(input, RNN_h_state)
-            RNN_h_state = Variable(RNN_h_state.data).cuda()
+            RNN_h_state = RNN_h_state.data.cuda()
             loss = criterion(prediction, target)
-            train_plot_loss_total += loss.data[0]
-            train_print_loss_total += loss.data[0]
+            train_plot_loss_total += loss.item()
+            train_print_loss_total += loss.item()
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
